@@ -1,0 +1,21 @@
+# -------------- BEGIN custom openssl.cnf -----
+ HOME                    = /home/jhover
+ oid_section             = new_oids
+ [ new_oids ]
+ 
+ [ req ]
+ default_days            = 730            # how long to certify for
+ default_keyfile         = /home/jhover/eclipse_privatekey.pem
+ distinguished_name      = req_distinguished_name
+ encrypt_key             = no
+ string_mask = nombstr
+ req_extensions = v3_req # Extensions to add to certificate request
+ 
+ [ req_distinguished_name ]
+ commonName              = Common Name (eg, YOUR name)
+ commonName_default      = eclipse.saros.us
+ commonName_max          = 64
+ 
+ [ v3_req ]
+subjectAltName=DNS:mail.saros.us,DNS:www.saros.us,DNS:inex.saros.us
+# -------------- END custom openssl.cnf -----
