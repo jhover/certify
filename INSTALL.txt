@@ -1,0 +1,32 @@
+Dependencies
+--------------
+pexpect
+	This is available for most RPM distributions from DAG:  http://dag.wieers.com/
+
+pyOpenSSL >=0.7
+	I've been using 0.8 installed via tarball from Sourceforge: http://sourceforge.net/project/pyopenssl 
+	In theory, it should be possible to create an RPM from this distribution.
+
+VDT:PPDG-Cert-Scripts 
+	Certify expects the cert-gridadmin command to be onthe path, so you should add the OSG setup to your shell profile. 
+	
+Installation
+---------------
+
+If you have root, you should be able to make an RPM from within this source distribution:
+	
+	python setup.py bdist_rpm 
+
+Once installed, the certify command should be on the path and ready to use. 	
+
+
+If you don't have root, you can do a home directory install from within this source distribution:
+    
+    python setup.py install --home=/home/myhomedir
+    
+(substitution in your own home dir for "myhomedir".)     
+
+
+Configuration
+----------------
+The program configuration file ~/.certify/certify.conf 

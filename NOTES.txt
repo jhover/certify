@@ -1,0 +1,114 @@
+Miscellaneous Notes and Info
+----------------------------
+
+To Do
+------
+
+-- complete capture, handling, and logging of all errors:
+    * Missing file, e.g. what if openssl fails to create a request. 
+    * Notice 0-length cert file created by openssl. 
+    * What if desired owner account doesn't exist? ERROR
+       
+-- more validation of match between desired cert parameters and retrieved cert.
+-- validation that cert file matches corresponding keyfile (use openssl to validate every time.)
+-- a force-renew switch to renew prior to normal time. 
+-- Nagios plugin and/Certify wrapper to track errors/warnings over time by looking at 
+output of a sequence of runs. 
+-- provide adjustBasePaths() method in CertifyHost to regularize path rewriting by plugins.
+-- support writing version string into Certify module from setup.py
+
+-- write database persistence functionality.
+
+-- exit with error if a host fails matching test for ~/.ssh/known_hosts. Users should manually 
+delete an entry that is incorrect. 
+
+
+
+Design Notes
+--------------
+
+certify.core.Certify
+  --contains configs
+  --a ThreadManager
+ 
+certify.core.CertifyThreadManager
+  -- contains Plugin
+  
+certify.core.CertifyHost
+  -- contains a hostname
+  -- contains 3 plugins to process host:
+   
+   IOPlugin:
+   Handles copying of files to/from a host. 
+      
+   CertPlugin 
+   Handles generation of request. Handles file <->memory representation of certificates,
+   requests.
+      
+   AdminPlugin
+   Handles submission of request to CA for signing. 
+   Handles retrieval of signed certificate from CA
+   OpenSSL does self-signing. 
+   VDT does submission to DOEgrids. 
+
+Plugins
+----------
+
+certify.plugins.LocalOpenSSLPlugin
+--generates and self-signs requests using openssl directly for the host 
+that Certify is being run on. 
+
+certify.plugins.RemoteOpenSSLPlugin
+--generates requests using 
+
+certify.plugins.VDTCertSCriptsPlugin
+
+CertifyHost
+certfile
+keyfile
+
+Local vs. SSHIOPlugin
+=============================================
+This is the trickiest problem. We don't want other plugins needing to know
+if things are local or remote, but command arguments (paths) will be different 
+depending on which is the case.
+
+?? perform path substitution as commands are executed?
+?? only substitute paths with /etc/grid-security??
+?? explicitly define all the commands that are needed? 
+!! construct paths *inside* the ioplugin, and have other plugins refer to them for 
+placement in commands!!
+
+Certhost paths should be absolute:
+/etc/grid-security/ldap/ldapcert.pem
+
+IOPlugin paths should prepend:
+SSHIOPlugin: null   -> /etc/grid-security/ldap/ldapcert.pem
+LocalIOPlugin: IOPlugin.hostroot (.e.g. ~/certificates/<hostname>/etc/grid-security/ldap/ldapcert.pem
+
+Temp paths should prepend:
+Certhost.workdir + hostname e.g. ~/certify-tmp/<hostname>
+
+
+
+Running remote commands via SSH
+============================================
+
+-- It is critical to use "-n" in order to avoid terminal weirdness with logging. 
+-- Had to add extra quoting and running remote commands under "bash -l" in order to handle SSH 
+weirdness with SunOS.
+
+
+The authenticity of host 'gridsrv006.usatlas.bnl.gov (130.199.185.239)' can't be established.
+RSA key fingerprint is f2:09:88:6a:f9:b7:70:46:f3:82:c8:ba:04:87:d4:cb.
+Are you sure you want to continue connecting (yes/no)?
+
+yes
+
+
+
+
+
+
+
+ 
