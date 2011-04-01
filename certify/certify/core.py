@@ -158,7 +158,8 @@ class Certify(object):
                 p = re.compile('(\d+\--\d+.*)')
                 hostBase = p.sub('', section, count=1).strip()
         
-                m = re.match(r'[a-zA-Z]+([\d,--]+)\..*', section)
+                #m = re.match(r'[a-zA-Z]+([\d,--]+)\..*', section)
+                m = re.match(r'[a-zA-Z-]+([\d,--]+)\..*', section)
                 range = m.group(1)
                 num = range.split("--")[0]
                 last = range.split("--")[1]
