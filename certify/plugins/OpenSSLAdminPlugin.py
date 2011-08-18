@@ -4,6 +4,7 @@ import logging
 import tempfile
 import commands
 import os
+import sys
 
 try:
     import OpenSSL
