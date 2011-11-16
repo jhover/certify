@@ -8,7 +8,7 @@ import sys
 from distutils.core import setup
 
 # For now, don't forget to increment this in certify-binary.py
-release_version='0.8.7'
+release_version='0.8.8'
 
 # Re-write version string in certify-binary.py
 #f = open('./certify/certify-binary.py' ,'w')

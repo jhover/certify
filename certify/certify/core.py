@@ -12,7 +12,10 @@ import traceback
 from StringIO import StringIO
 
 from ConfigParser import NoOptionError, ConfigParser, MissingSectionHeaderError
-
+try:
+    from email.mime.text import MIMEText
+except:
+    from email import MIMEText
 
 class Certify(object):
     '''
@@ -614,6 +617,14 @@ class CertifyHost(threading.Thread):
         else:
             self.noclean = False 
         
+        # Gather notification preferences
+        self.email_on_replacement =  self.config.get(section, 'email_on_replacement')
+        if self.email_on_replacement:
+            self.email_from = self.config.get(section, 'email_from')
+            self.email_to = self.config.get(section, 'email_to')
+            self.email_subject = self.config.get(section, 'email_subject')
+            self.smtp_host = self.config.get(section, 'smtp_host')
+        
         # Establish "remote" target dir and paths to files for this host/service
         self.reqfile = "%s/%sreq.pem" % (self.targetdir, self.prefix)
         self.certfile = "%s/%scert.pem" % (self.targetdir, self.prefix)
@@ -680,6 +691,7 @@ class CertifyHost(threading.Thread):
                                                                                                          ren.days))
                     self._newCertificate()
                     self.topcertify.incrementRenewed()
+                    self._notifyreplacement()
 
                 else:
                     self.log.info("[%s:%s] Expiration (%s days) > threshold (%s days). No renewal necessary."% (self.hostname, 
@@ -691,6 +703,7 @@ class CertifyHost(threading.Thread):
                 self.log.info("[%s:%s] No certificate or mismatched cert. Make new certificate..."% (self.hostname,self.service))
                 self._newCertificate()
                 self.topcertify.incrementRenewed()
+                self._notifyreplacement()
         except Exception, e:
             self.log.error("[%s:%s] Significant error encountered. Aborting handling of this host. Message: %s " % (self.hostname,
                                                                                                                     self.service, 
@@ -718,6 +731,31 @@ class CertifyHost(threading.Thread):
         self.ioplugin.putCertificate()
                 
         self.log.debug("[%s:%s] Done."% (self.hostname,self.service))
+
+    def _send_message(self, subject, messagestring):
+        msg = MIMEText.MIMEText(messagestring)
+        
+        # me == the sender's email address
+        # you == the recipient's email address
+        msg['Subject'] = subject 
+        msg['From'] = self.email_from
+        msg['To'] = self.email_to
+        
+        # Send the message via our own SMTP server, but don't include the
+        # envelope header.
+        s = smtplib.SMTP(self.smtp_host)
+        self.log.info("Sending email: %s" % msg.as_string())
+        s.sendmail(self.email_from , [self.email_to], msg.as_string())
+        s.quit()
+
+    def _notifyreplacement(self):
+        msgsub = "Certificate replaced on %s"
+        msgtxt = "Certify replaced the %s certificate at %s on host %s." % (self.service,
+                                                                           self.certfile,
+                                                                           self.hostname)
+        msgtxt += "Please take whatever action is needed to enable cert usage."
+        self._send_message(msgsub, msgtxt)
+        self.log.info("Sent notification of replacement to %s." % self.email_to)
 
     def __str__(self):
         return prettyObjectPrint(self)
