@@ -177,7 +177,7 @@ class Certify(object):
                 hostList += [hostBase + last + domain]
                 return hostList
             except Exception, error:
-                self.log.error("Invalid format in hosts file for section %s: %s" % (section, error))
+                self.log.error("Invalid format in hosts file, section: %s: %s" % (section, error))
                 raise
         else:
             hostList = [section.strip()]
@@ -696,7 +696,7 @@ class CertifyHost(threading.Thread):
                     self._notifyreplacement()
 
                 else:
-                    self.log.info("[%s:%s] Expiration (%s days) > threshold (%s days). No renewal necessary."% (self.hostname, 
+                    self.log.info("[%s:%s] Expiration (%s days) > threshold (%s days). No renewal needed."% (self.hostname, 
                                                                                                                  self.service, 
                                                                                                                  tdiff.days,
                                                                                                                  ren.days))
@@ -707,7 +707,7 @@ class CertifyHost(threading.Thread):
                 self.topcertify.incrementRenewed()
                 self._notifyreplacement()
         except Exception, e:
-            self.log.error("[%s:%s] Significant error encountered. Aborting handling of this host. Message: %s " % (self.hostname,
+            self.log.error("[%s:%s] Serious error. Aborting. Message: %s " % (self.hostname,
                                                                                                                     self.service, 
                                                                                                                     e))
             self.topcertify.incrementError()
@@ -718,7 +718,7 @@ class CertifyHost(threading.Thread):
                 p.cleanup()
             self.cleanup()
         else:
-            self.log.info("[%s:%s] Post run cleanup disabled (noclean). Leaving temp files intact." % (self.hostname,self.service))     
+            self.log.info("[%s:%s] Post-run cleanup disabled (noclean)." % (self.hostname,self.service))     
         self.log.debug("[%s:%s] Done." % (self.hostname,self.service))
 
     def _newCertificate(self):
@@ -755,7 +755,7 @@ class CertifyHost(threading.Thread):
         msgtxt = "Certify has replaced the %s certificate at %s on host %s." % (self.service,
                                                                            self.certfile,
                                                                            self.hostname)
-        msgtxt += "\nPlease take whatever action is needed to enable cert usage."
+        msgtxt += "\nPlease take whatever action is needed to enable certificate usage."
         self._send_message(msgsub, msgtxt)
         self.log.info("Sent notification of replacement to %s." % self.email_to)
 
