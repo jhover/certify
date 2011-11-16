@@ -751,11 +751,11 @@ class CertifyHost(threading.Thread):
         s.quit()
 
     def _notifyreplacement(self):
-        msgsub = "Certificate replaced on %s"
-        msgtxt = "Certify replaced the %s certificate at %s on host %s." % (self.service,
+        msgsub = "Certify: Certificate replaced on %s" % self.hostname
+        msgtxt = "Certify has replaced the %s certificate at %s on host %s." % (self.service,
                                                                            self.certfile,
                                                                            self.hostname)
-        msgtxt += "Please take whatever action is needed to enable cert usage."
+        msgtxt += "\nPlease take whatever action is needed to enable cert usage."
         self._send_message(msgsub, msgtxt)
         self.log.info("Sent notification of replacement to %s." % self.email_to)
 
