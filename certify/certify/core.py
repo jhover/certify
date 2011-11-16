@@ -742,12 +742,13 @@ class CertifyHost(threading.Thread):
         msg['Subject'] = subject 
         msg['From'] = self.email_from
         msg['To'] = self.email_to
+        tolist = self.email_to.split(",")
         
         # Send the message via our own SMTP server, but don't include the
         # envelope header.
         s = smtplib.SMTP(self.smtp_host)
         self.log.info("Sending email: %s" % msg.as_string())
-        s.sendmail(self.email_from , [self.email_to], msg.as_string())
+        s.sendmail(self.email_from , tolist , msg.as_string())
         s.quit()
 
     def _notifyreplacement(self):
