@@ -68,7 +68,7 @@ class SshIOPlugin(CertifyIOInterface):
                                                                     o))
             s.logout()
         except Exception, e:
-            raise SshIOPluginConnectionException("%s: SSH key not enabled or non-existent host." % self.certhost.hostname)
+            raise SshIOPluginConnectionException("No SSH key, or no such host.")
             
 
 
