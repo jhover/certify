@@ -9,23 +9,48 @@ pyOpenSSL >=0.7
 
 VDT:PPDG-Cert-Scripts 
 	Certify expects the cert-gridadmin command to be onthe path, so you should add the OSG setup to your shell profile. 
-	
+
+
 Installation
 ---------------
 
-If you have root, you should be able to make an RPM from within this source distribution:
-	
-	python setup.py bdist_rpm 
-
-Once installed, the certify command should be on the path and ready to use. 	
-
+If you have root, and are running RHEL 5.X, the easiest	way to use certify would be to install the BNL RPM repo:
+  -- Navigate to http://dev.racf.bnl.gov/yum/grid/production/rhel/5Client/x86_64/
+  -- wget (or otherwise download) the racf-grid-release-latest.noarch.rpm
+  -- Install the RPM. 'rpm -ivh racf-grid-release-latest.noarch.rpm'
+  -- You may need to enable the testing repo (edit /etc/yum.repos.d/racf-grid-testing.repo) depending on whether
+     a production version of certify is available. 
+  
 If you don't have root, you can do a home directory install from within this source distribution:
     
     python setup.py install --home=/home/myhomedir
     
-(substitution in your own home dir for "myhomedir".)     
-
+(substitution in your own home dir for "myhomedir".) You'll need to confirm the dependencies above are already installed.      
 
 Configuration
 ----------------
-The program configuration file ~/.certify/certify.conf 
+
+  As a user, you'll then need to set up the config files. Recommended:
+  --  mkdir ~/.certify
+  --  'cp /usr/share/certify/config/*.conf ~/.certify'  (or from ~/share/certify/config). 
+  -- Make sure your cert is at ~/.globus/user[cert|key].pem , and that there is a passphrase. 
+  -- Edit certify.conf and set the hostsuri to point at your hosts.conf
+  -- Edit hosts.conf and set all the site/individual specific info (e.g. smtp host, email addresses, etc.)
+  
+  -- The default is to create a self-signed cert, so try that first.
+        -- Create a single dummy host section, e.g. [myhost.mydomain.com]
+        -- Run 'certify -c ~/.certify.conf -v -L ~/certify.log'
+  
+  -- Assuming that works, try using the SSHIOPlugin. 
+       
+    -- Create a real host section, e.g. [myrealhost.mydomain.com]
+    -- Set that host to use ioclass=SSHIOPlugin
+    -- Be sure ssh-agent is running properly and you can log in to the target host(s)
+  
+  -- Assuming that works, and you get a notification email, try to automatically create a DOEgrids host cert: 
+    -- Confirm that the cert-gridadmin command is set up properly.
+    -- Create or edit another real host section. 
+    -- Set that host to use adminclass=VDTAdminPlugin
+    -- Be sure your DN is registered with grid administrator rights at DOEgrids. 
+
+
