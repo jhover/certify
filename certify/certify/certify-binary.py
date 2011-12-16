@@ -28,7 +28,7 @@ config_file = None
 hostsuri_override= None
 default_configfile = os.path.expanduser("~/.certify/certify.conf")
 logfile = None
-version="0.8.8"
+version="0.9.0"
 
 usage = """Usage: main.py [OPTIONS]  
 OPTIONS: 
