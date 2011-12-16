@@ -19,7 +19,6 @@ If you have root, you should be able to make an RPM from within this source dist
 
 Once installed, the certify command should be on the path and ready to use. 	
 
-
 If you don't have root, you can do a home directory install from within this source distribution:
     
     python setup.py install --home=/home/myhomedir
