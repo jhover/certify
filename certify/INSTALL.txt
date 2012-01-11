@@ -16,7 +16,8 @@ pexpect/pxssh
 	Ugly, but seems to be unavoidable. 
 	
 pyOpenSSL >=0.7
-	I've been using 0.8 installed via tarball from Sourceforge: http://sourceforge.net/project/pyopenssl 
+	I've been using 0.8 installed via tarball from Sourceforge: 
+	    http://sourceforge.net/project/pyopenssl 
 	In theory, it should be possible to create an RPM from this distribution.
 
 VDT:PPDG-Cert-Scripts 
