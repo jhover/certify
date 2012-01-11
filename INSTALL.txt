@@ -1,8 +1,20 @@
 Dependencies
 --------------
-pexpect
-	This is available for most RPM distributions from DAG:  http://dag.wieers.com/
+pexpect/pxssh
+	This is available from many distributions. And is also downloadable from 
+	   http://sourceforge.net/projects/pexpect/files/
 
+	If you encounter problems with SSH login, you may need to refer to 
+	  http://www.velocityreviews.com/forums/t585117-read_nonblocking-error-in-pxssh.html
+	and possibly add:
+	    self.sendline()
+        time.sleep(0.5)
+    just before:
+        self.read_nonblocking(size=10000,timeout=1) # GAS: Clear out the cache before getting the prompt
+	in pxssh.py
+	
+	Ugly, but seems to be unavoidable. 
+	
 pyOpenSSL >=0.7
 	I've been using 0.8 installed via tarball from Sourceforge: http://sourceforge.net/project/pyopenssl 
 	In theory, it should be possible to create an RPM from this distribution.
