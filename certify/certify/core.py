@@ -17,7 +17,7 @@ from ConfigParser import NoOptionError, ConfigParser, MissingSectionHeaderError
 try:
     from email.mime.text import MIMEText
 except:
-    from email import MIMEText
+    from email.MIMEText import MIMEText
 
 class Certify(object):
     '''
@@ -735,7 +735,7 @@ class CertifyHost(threading.Thread):
         self.log.debug("[%s:%s] Done."% (self.hostname,self.service))
 
     def _send_message(self, subject, messagestring):
-        msg = MIMEText.MIMEText(messagestring)
+        msg = MIMEText(messagestring)
         
         # me == the sender's email address
         # you == the recipient's email address
