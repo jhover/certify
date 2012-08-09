@@ -315,8 +315,9 @@ subjectAltName = %s
         
         '''
         self.log.debug('[%s:%s] Start...'% (self.certhost.hostname, self.certhost.service))
-        cmd = "openssl req  -new -config %s -out %s -keyout %s.pk8.new; openssl -in %s.pk8.new -out %s.new ; chmod 400 %s.new " % (self.sslconffile,
+        cmd = "openssl req  -new -config %s -out %s -keyout %s.pk8.new; openssl -in %s.pk8.new -out %s.new ; chmod 400 %s.new ; rm -f %s.pk8.new " % (self.sslconffile,
                                                                        self.certhost.reqfile,
+                                                                       self.certhost.keyfile,
                                                                        self.certhost.keyfile,
                                                                        self.certhost.keyfile,
                                                                        self.certhost.keyfile,
