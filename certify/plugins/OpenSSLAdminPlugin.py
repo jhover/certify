@@ -9,8 +9,11 @@ import sys
 try:
     import OpenSSL
     from OpenSSL import crypto
-    vers = float(OpenSSL.version.__version__)
-    if vers < 0.7 :
+    vers = float(OpenSSL.version.__version__ )
+    major, minor = str(vers).split('.')[:2]
+    intmajor = int(major)
+    intminor = int(minor)
+    if intmajor < 1 and intminor < 7:
         print "This plugin requires pyOpenSSL >= 0.7"
         sys.exit(0)   
 except ImportError:
