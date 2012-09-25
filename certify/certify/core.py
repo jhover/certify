@@ -76,6 +76,7 @@ class Certify(object):
         
         self.certhostinfolist = []
         self.certhostlist = []
+        self.pluginlist = {}
         self.log.debug("About to process all sections in merged hosts config.") 
         self.log.debug('Hosts config: \n%s' % _safePrintConfig(self.hosts_config))
         for sect in self.hosts_config.sections():
@@ -92,6 +93,8 @@ class Certify(object):
                         self.hosts_config.set(h, key,value)
                         
             for h in self.nodelist: 
+                for plugintype in ['ioclass','certclass','adminclass']:
+                    self.pluginlist[self.hosts_config.get(h,plugintype)] = 1
                 svclist=self.hosts_config.get(h,'services').split(',')
                 for s in svclist:
                     #t = CertifyHost(self.config, self.hosts_config,sect,h,s)
@@ -100,6 +103,7 @@ class Certify(object):
                     self.log.debug("Created CertifyHostInfo tuple for host '%s' and service '%s'" %(h,s))
                     self.certhostinfolist.append(chinfo)
                     self.certhostlist.append(chinfo)
+                
         self.log.info('Processed configuration containing %d host/service items...' % len(self.certhostinfolist))        
         self.numhosts = len(self.certhostinfolist)
         
@@ -118,16 +122,18 @@ class Certify(object):
                                                                                                 self.maxthreads)) 
         self.log.info('Will run %d threadmanagers concurrently. Max %d concurrent threads.' % (self.maxmanagers,
                                                                                                self.maxmanagers * self.maxthreads
-                                                                                               ))
-        self._loadPlugins()
+                                                                                              ))
+        self.log.info('Loading plugins: %s' % self.pluginlist.keys() ) 
+        self._loadPlugins(self.pluginlist.keys())
         self.log.debug('Done.')
     
-    def _loadPlugins(self):
+    def _loadPlugins(self, modulenames):
         '''
-        Do a module load of all plugins to allow them to do pre-processing work at module level if necessary.
+        Do a module load of all plugins to allow them to do pre-processing work at module 
+        level if necessary. Only import plugins actually referred to in current config.
         
         '''
-        from certify.plugins import *
+        #from certify.plugins import *
     
     def _processSimple(self, r):
         '''

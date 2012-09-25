@@ -1,5 +1,6 @@
 #!/bin/bash
-PYVER=`python -V 2>&1  | awk '{ print $2 }'  |  grep -o "[[:digit:]+]\.[[:digit:]]" `
+# PYVER=`python -V 2>&1  | awk '{ print $2 }'  |  grep -o "[[:digit:]+]\.[[:digit:]]" `
+PYVER=`python -V 2>&1 | awk '{ print $2}' | awk -F '.' '{ print $1"."$2 }' `
 #echo $PYVER
 RPMEXE=/usr/lib/python$PYVER/site-packages/certify/certify-binary.py
 HOMEEXE=~/lib/python/certify/certify-binary.py
