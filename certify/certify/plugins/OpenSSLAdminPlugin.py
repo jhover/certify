@@ -9,7 +9,7 @@ import sys
 try:
     import OpenSSL
     from OpenSSL import crypto
-    vers = float(OpenSSL.version.__version__ )
+    vers = OpenSSL.version.__version__
     major, minor = str(vers).split('.')[:2]
     intmajor = int(major)
     intminor = int(minor)
@@ -19,6 +19,7 @@ try:
 except ImportError:
     print  "This plugin requires pyOpenSSL >= 0.7"
     sys.exit(0)
+    
    
 from certify.core import CertifyAdminInterface
 
