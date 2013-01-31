@@ -8,7 +8,7 @@ import commands
 try:
     import OpenSSL
     from OpenSSL import crypto
-    vers = float(OpenSSL.version.__version__ )
+    vers = OpenSSL.version.__version__
     major, minor = str(vers).split('.')[:2]
     intmajor = int(major)
     intminor = int(minor)
