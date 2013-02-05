@@ -102,7 +102,7 @@ class SshIOPlugin(CertifyIOInterface):
             self.putFile(  self.certhost.tempcertfile,
                             self.certhost.certfile)                
         except Exception, e:
-            self.log.debug('[%s:%s] Error copying certfile to %s on remote host.'% (self.certhost.hostname,
+            self.log.error('[%s:%s] Error copying certfile to %s on remote host.'% (self.certhost.hostname,
                                                                                     self.certhost.service, 
                                                                                  self.certhost.certfile ))
         # Set perms on cert
@@ -111,7 +111,7 @@ class SshIOPlugin(CertifyIOInterface):
                            owner=self.certhost.owneruser, 
                            group=self.certhost.ownergroup)
         except Exception, e:
-            self.log.debug('[%s:%s] Error fixing permissions on %s on remote host.'% (self.certhost.hostname,
+            self.log.error('[%s:%s] Error fixing permissions on %s on remote host.'% (self.certhost.hostname,
                                                                                     self.certhost.service,
                                                                                     self.certhost.certfile )) 
         
@@ -120,7 +120,7 @@ class SshIOPlugin(CertifyIOInterface):
             cmd = "mv -f %s.new %s" % ( self.certhost.keyfile, self.certhost.keyfile)
             self.executeCommand(cmd)
         except Exception, e:
-            self.log.debug('[%s:%s] Error moving keyfile %s from .new to final.'% (self.certhost.hostname,
+            self.log.error('[%s:%s] Error moving keyfile %s from .new to final.'% (self.certhost.hostname,
                                                                                     self.certhost.service,
                                                                                     self.certhost.keyfile )) 
 
@@ -130,7 +130,7 @@ class SshIOPlugin(CertifyIOInterface):
                            owner=self.certhost.owneruser, 
                            group=self.certhost.ownergroup)
         except Exception, e:
-            self.log.debug('[%s:%s] Error fixing permissions on %s on remote host.'% (self.certhost.hostname,
+            self.log.error('[%s:%s] Error fixing permissions on %s on remote host.'% (self.certhost.hostname,
                                                                                     self.certhost.service, 
                                                                                  self.certhost.certfile ))        
         self.log.debug('[%s:%s] End.'% ( self.certhost.hostname, self.certhost.service))               
