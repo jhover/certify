@@ -63,6 +63,7 @@ class OSGAdminPlugin(CertifyAdminInterface):
         return phraseOK      
     checkPassphrase=classmethod(checkPassphrase)
     
+    
     def __init__(self, certhost):
         super(OSGAdminPlugin, self).__init__(certhost)
         self.log = logging.getLogger()
@@ -76,7 +77,7 @@ class OSGAdminPlugin(CertifyAdminInterface):
                                               self.certhost.service)) 
                 
     def _check_gridadmin_command(self):
-        cmd = "which osg-cert-request"
+        cmd = "which osg-gridadmin-cert-request"
         (status,output)=commands.getstatusoutput(cmd)
         if status:
             mesg='''This Certify plugin (OSGAdminPlugin) requires the VDT PPDG-Cert-Scripts to be installed,
@@ -103,6 +104,14 @@ and the osg-cert-request command to be in the PATH.'''
         
         # build command
         cmd = self._buildGridadminCommand()        
+        
+        # change working directory to tmproot
+        self.log.debug("[%s:%s] Changing dir to %s" % (self.certhost.hostname, 
+                                                       self.certhost.service,
+                                                       self.certhost.temproot
+                                                       ))
+        os.chdir(self.certhost.temproot)
+        
         # run it using pexpect        
         process = pexpect.spawn(cmd)
         process.expect(['nter PEM pass phrase:'])
@@ -167,64 +176,59 @@ and the osg-cert-request command to be in the PATH.'''
                 self.tempDirLocal) 
         
         NEW
-          -c CSR, --csr=CSR     Specify CSR name (default = gennew.csr)
-          -o Output Keyfile, --outkeyfile=Output Keyfile
-                        Specify the output filename for the retrieved user
-                        certificate.  Default is ./hostkey.pem
-          -y CC List, --cc=CC List
-                        Specify the CC list(the email id's to be CCed). Separate values by ','
-          -m Comment, --comment=Comment
-                        The comment to be added to the request
-          -t CN, --hostname=CN  Specify hostname for CSR (FQDN)
-          -e EMAIL, --email=EMAIL
-                        Email address to receive certificate
-          -n NAME, --name=NAME  Name of user receiving certificate
-          -p PHONE, --phone=PHONE
-                        Phone number of user receiving certificate
-          -v VO, --vo=VO
-                        VO name of requested hostname
-          -T, --test            Run in test mode
-          -q, --quiet           don't print status messages to stdout
 
-Example:
+    osg-gridadmin-cert-request 
+  
+    -k PKEY, --pkey=PKEY  Specify Requestor's private key (PEM Format).  If not
+                        specified             will take the value of
+                        X509_USER_KEY or $HOME/.globus/userkey.pem
+    -c CERT, --cert=CERT  Specify Requestor's certificate (PEM Format).  If not
+                        specified             will take the value of
+                        X509_USER_CERT or $HOME/.globus/usercert.pem
+    -v VO name, --vo=VO name
+                        Specify the VO for the host request
+    -T, --test            Run in test mode
+    -t TIMEOUT, --timeout=TIMEOUT
+                        Specify the timeout in minutes
+    -q, --quiet           don't print status messages to stdout
+    -V, --version         Print version information and exit
 
-python osg-cert-request -t hostname.domain.com -e emailaddress@domain.com -n "Your Name" -p 9999999999 -y "xyz@domain.com,abc@domain.com" -m "This is my comment"
-python osg-cert-request -t hostname.domain.com -e emailaddress@domain.com -n "Your Name" -p 9999999999 -y "xyz@domain.com,abc@domain.com" -m "This is my comment" --csr mycsr.csr
+  Hostname Options:
+    Use either of these options. Specify hostname as a single hostname
+    using -H/--hostname or specify from a file using -f/--hostfile.
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+    -H HOSTNAME, --hostname=HOSTNAME
+                        Specify the hostname or service/hostname for which you
+                        want to request              the certificate for.  If
+                        specified -f/--hostfile will be ignored
+    -f HOSTFILE, --hostfile=HOSTFILE
+                        Filename with one hostname or service/hostname per
+                        line
+
         
         '''
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) )
-        cmd = "osg-cert-request "
-        cmd += "-host %s " % self.certhost.certhostname
-        cmd += "-prefix %s " % self.certhost.prefix
-        cmd += "-request %s " % self.certhost.tempreqfile
-        cmd += "-email %s "  % self.certhost.config.get(self.certhost.hostname, "cert_email")
-        cmd += "-affiliation %s " % self.certhost.globalconfig.get('OSGAdminPlugin', "affiliation")
-        cmd += "-vo %s " % self.certhost.globalconfig.get('OSGAdminPlugin', "vo")
-        cmd += "-ca %s " % self.certhost.globalconfig.get('OSGAdminPlugin', "ca")
-        # cmd += "-pdir %s " %  
-        (certbasedir,file) = os.path.split(self.certhost.tempcertfile) 
+        cmd = "osg-gridadmin-cert-request "        
+        cmd += "--hostname %s " % self.certhost.commonname
+        cmd += "--vo %s " % self.certhost.globalconfig.get('osgadminplugin', "vo")
         
-        cmd += "-sdir %s " % certbasedir
-        if self.certhost.globalconfig.get('global', 'noclean') == 'true':
-            cmd += "-noclean "
+        
+                
+        # cmd += "-prefix %s " % self.certhost.prefix
+        # cmd += "--outkeyfile=%s " 
+        #cmd += "--csr %s " % self.certhost.tempreqfile
+        #cmd += "--email %s "  % self.certhost.config.get(self.certhost.hostname, "cert_email")
+        #cmd += "-affiliation %s " % self.certhost.globalconfig.get('OSGAdminPlugin', "affiliation")
+        #cmd += "-ca %s " % self.certhost.globalconfig.get('OSGAdminPlugin', "ca")
+        # cmd += "-pdir %s " %  
+        # (certbasedir,file) = os.path.split(self.certhost.tempcertfile)       
+        #cmd += "-sdir %s " % certbasedir
+        #if self.certhost.globalconfig.get('global', 'noclean') == 'true':
+        #    cmd += "-noclean "
         #cmd += "-password %s " % self.passfile
-        cmd += "-timeout %s " % self.certhost.globalconfig.get('OSGAdminPlugin', "timeout")                 
+        # cmd += "-timeout %s " % self.certhost.globalconfig.get('OSGAdminPlugin', "timeout")                 
         #cmd = "osg-cert-request -V"
+        
         self.log.debug("[%s:%s] Command is %s" % (self.certhost.hostname, self.certhost.service, cmd) )
         self.log.debug("[%s:%s] Done." % (self.certhost.hostname, self.certhost.service) )
         return cmd 
