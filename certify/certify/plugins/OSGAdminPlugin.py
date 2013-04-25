@@ -212,8 +212,7 @@ and the osg-cert-request command to be in the PATH.'''
         cmd += "--hostname %s " % self.certhost.commonname
         cmd += "--vo %s " % self.certhost.globalconfig.get('osgadminplugin', "vo")
         
-        
-                
+                        
         # cmd += "-prefix %s " % self.certhost.prefix
         # cmd += "--outkeyfile=%s " 
         #cmd += "--csr %s " % self.certhost.tempreqfile
