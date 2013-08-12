@@ -208,7 +208,7 @@ and the osg-cert-request command to be in the PATH.'''
         
         '''
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) )
-        cmd = "osg-gridadmin-cert-request "        
+        cmd = "cd %s ; osg-gridadmin-cert-request " % self.certhost.temproot        
         cmd += "--hostname %s " % self.certhost.commonname
         cmd += "--vo %s " % self.certhost.globalconfig.get('osgadminplugin', "vo")
         
@@ -253,3 +253,4 @@ and the osg-cert-request command to be in the PATH.'''
 
 '''
 OSGAdminPlugin.getPassphrase()
+

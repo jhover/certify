@@ -4,7 +4,7 @@ Certify internals guide, for plugin development
 Object      Attribute            Meaning                                   Example(s)
 
 
-CertifyHost
+CertifyHost Target values
             ch.certhostname      Subject of cert. 
             ch.section           Config section name.
             ch.hostname          Should = section. DNS host to connect to.
@@ -12,6 +12,17 @@ CertifyHost
             ch.prefix            Inserted before "cert.pem" and "key.pem" http -> httpcert.pem
             ch.owneruser         Unix owner                               apache
             ch.ownergroup        Unix owner group                         web
-            ch.targetdir         Top level dir:                           /etc/grid-security
-            ch.svcprefix         CN service prefix                        http ->             
+            ch.targetdir         Target top level dir:                    /etc/grid-security
+            ch.svcprefix         CN service prefix                        http  (in CN: http/my.host.gov)            
             ch.commonname        Derived value ("svcprefix/certhosename")
+            
+CertifyHost Local values:            
+            
+            workdir              top-level local workdir                   ~/certificates
+            ch.temproot          workdir for this host                     ~/certificates/my.host.gov/hostreq.pem
+            ch.tempreqfile                                                 ~/certificates/my.host.gov/hostkey.pem
+            ch.tempkeyfile
+            
+OSGAdmin values:
+		    <svc>-<host>.pem      Actual returned cert
+		    <svc>-<host>-key.pem  Actual returned key
