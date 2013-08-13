@@ -244,27 +244,11 @@ and the osg-cert-request command to be in the PATH.'''
         
         '''
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) )
-        cmd = "osg-gridadmin-cert-request -T " % self.certhost.temproot        
+        cmd = "osg-gridadmin-cert-request -T "        
         cmd += "--hostname %s " % self.certhost.commonname
         cmd += "--vo %s " % self.certhost.globalconfig.get('osgadminplugin', "vo")
         
-        
-                        
-        # cmd += "-prefix %s " % self.certhost.prefix
-        # cmd += "--outkeyfile=%s " 
-        #cmd += "--csr %s " % self.certhost.tempreqfile
-        #cmd += "--email %s "  % self.certhost.config.get(self.certhost.hostname, "cert_email")
-        #cmd += "-affiliation %s " % self.certhost.globalconfig.get('OSGAdminPlugin', "affiliation")
-        #cmd += "-ca %s " % self.certhost.globalconfig.get('OSGAdminPlugin', "ca")
-        # cmd += "-pdir %s " %  
-        # (certbasedir,file) = os.path.split(self.certhost.tempcertfile)       
-        #cmd += "-sdir %s " % certbasedir
-        #if self.certhost.globalconfig.get('global', 'noclean') == 'true':
-        #    cmd += "-noclean "
-        #cmd += "-password %s " % self.passfile
-        # cmd += "-timeout %s " % self.certhost.globalconfig.get('OSGAdminPlugin', "timeout")                 
-        #cmd = "osg-cert-request -V"
-        
+       
         self.log.debug("[%s:%s] Command is '%s'" % (self.certhost.hostname, self.certhost.service, cmd) )
         self.log.debug("[%s:%s] Done." % (self.certhost.hostname, self.certhost.service) )
         return cmd 
