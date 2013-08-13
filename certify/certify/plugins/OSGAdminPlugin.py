@@ -84,8 +84,7 @@ class OSGAdminPlugin(CertifyAdminInterface):
 and the osg-cert-request command to be in the PATH.'''
             print(mesg)
             sys.exit(0)
-    
-    
+        
                 
     def submitRequest(self):
         '''
@@ -100,10 +99,7 @@ and the osg-cert-request command to be in the PATH.'''
             os.remove(self.certhost.tempcertfile)
         except OSError:
             pass
-        
-        
-        # build command
-        cmd = self._buildGridadminCommand()        
+              
         
         # change working directory to tmproot
         self.log.debug("[%s:%s] Changing dir to %s" % (self.certhost.hostname, 
@@ -112,17 +108,57 @@ and the osg-cert-request command to be in the PATH.'''
                                                        ))
         os.chdir(self.certhost.temproot)
         
+        # build command
+        cmd = self._buildGridadminCommand() 
+       
+        
         # run it using pexpect        
-        process = pexpect.spawn(cmd)
-        process.expect(['nter PEM pass phrase:'])
+        #
+        #  Please enter the pass phrase for '/home/jhover/.globus/userkey.pem':
+        #Connection object created.
+        # About to make request to https://oim.grid.iu.edu:443/oim/rest?action=user_info
+        # About to get response...
+        # Waiting for response from Quota Check API. Please wait.
+        # Beginning request process for griddev02.racf.bnl.gov
+        # Generating certificate...
+        # Id is: 1129
+        # Connecting to server to approve certificate...
+        # Issuing certificate...
+        # . 
+        # Certificate written to ./griddev02.racf.bnl.gov.pem
+        #
+        #
+
+        self.log.info("[%s:%s] Running request command..." % (self.certhost.hostname,
+                                                              self.certhost.service) )
+        process = pexpect.spawn(cmd, timeout=300)
+        process.expect([".pem':"])
+        self.log.debug("[%s:%s] Providing passphrase to command..."% (self.certhost.hostname, 
+                                                                      self.certhost.service))
         process.sendline(self.passphrase)
         process.expect([pexpect.EOF])
         self.log.debug("[%s:%s] Command output: %s"% (self.certhost.hostname, 
                                                       self.certhost.service, 
                                                       process.before.strip() )  ) 
         
-    
-    
+        if self.certhost.svcprefix:
+            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.hostname) 
+            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.hostname)
+        else:
+            certfilename = "%s.pem" % (self.certhost.hostname) 
+            keyfilename = "%%s-key.pem" % (self.certhost.hostname)            
+        self.certhost.tempcertfile = "%s%s" % (self.certhost.temproot, certfilename) 
+        self.certhost.tempkeyfile = "%s%s" % (self.certhost.temproot, keyfilename) 
+        self.log.debug("[%s:%s] Reset temp cert filename: %s" % (self.certhost.hostname,
+                                                                 self.certhost.service,
+                                                                 self.certhost.tempcertfile                                                                 
+                                                                 ))
+        self.log.debug("[%s:%s] Reset temp key filename: %s" % (self.certhost.hostname,
+                                                                 self.certhost.service,
+                                                                 self.certhost.tempkeyfile                                                                 
+                                                                 ))        
+        
+        
     def retrieveCertificate(self):
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) ) 
         # Confirm existence of tmpcertfile
@@ -208,9 +244,10 @@ and the osg-cert-request command to be in the PATH.'''
         
         '''
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) )
-        cmd = "cd %s ; osg-gridadmin-cert-request " % self.certhost.temproot        
+        cmd = "cd %s ; osg-gridadmin-cert-request -T " % self.certhost.temproot        
         cmd += "--hostname %s " % self.certhost.commonname
         cmd += "--vo %s " % self.certhost.globalconfig.get('osgadminplugin', "vo")
+        
         
                         
         # cmd += "-prefix %s " % self.certhost.prefix
@@ -232,20 +269,20 @@ and the osg-cert-request command to be in the PATH.'''
         self.log.debug("[%s:%s] Done." % (self.certhost.hostname, self.certhost.service) )
         return cmd 
 
-    def _makePassfile(self):
-        (fd,pathname) = tempfile.mkstemp(".tmp", "pp", self.certhost.workdir)      
-        self.passfile = pathname
-        self.log.debug("[%s:%s] File descriptor=%s  File path=%s" % (self.certhost.hostname, 
-                                                                     self.certhost.service,
-                                                                     fd,
-                                                                     self.passfile) )
-        f=os.fdopen(fd, 'w')
-        f.write(self.passphrase)
-        f.close()
+    #def _makePassfile(self):
+    #    (fd,pathname) = tempfile.mkstemp(".tmp", "pp", self.certhost.workdir)      
+    #    self.passfile = pathname
+    #    self.log.debug("[%s:%s] File descriptor=%s  File path=%s" % (self.certhost.hostname, 
+    #                                                                 self.certhost.service,
+    #                                                                 fd,
+    #                                                                 self.passfile) )
+    #    f=os.fdopen(fd, 'w')
+    #    f.write(self.passphrase)
+    #    f.close()
         
     
-    def _deletePassfile(self):
-        os.remove(self.passfile)
+    #def _deletePassfile(self):
+    #    os.remove(self.passfile)
 
 '''
    The following is necessary to trigger passphrase input on initial import, not just when class is instantiated 
