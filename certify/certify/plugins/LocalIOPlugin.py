@@ -80,8 +80,14 @@ class LocalIOPlugin(CertifyIOInterface):
     def putCertificate(self):
         self.log.debug('[%s:%s] Start...'% (self.certhost.hostname, self.certhost.service))
         self.putFile(self.certhost.tempcertfile, self.certhost.certfile )
+        self.putFile(self.certhost.tempkeyfile, self.certhost.keyfile )
         self.log.debug('[%s:%s] End.'% (self.certhost.hostname, self.certhost.service))
 
+
+    def putCertificateOld(self):
+        self.log.debug('[%s:%s] Start...'% (self.certhost.hostname, self.certhost.service))
+        self.putFile(self.certhost.tempcertfile, self.certhost.certfile )
+        self.log.debug('[%s:%s] End.'% (self.certhost.hostname, self.certhost.service))
 
     def getRequest(self):
         '''
