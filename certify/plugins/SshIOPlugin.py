@@ -115,6 +115,48 @@ class SshIOPlugin(CertifyIOInterface):
                                                                                     self.certhost.service,
                                                                                     self.certhost.certfile )) 
         
+        try:
+            self.putFile(  self.certhost.tempkeyfile,
+                            self.certhost.keyfile)                
+        except Exception, e:
+            self.log.error('[%s:%s] Error copying keyfile to %s on remote host.'% (self.certhost.hostname,
+                                                                                    self.certhost.service, 
+                                                                                 self.certhost.keyfile ))
+
+        # Set perms on key                                                                          
+        try:
+            self.setPerms(self.certhost.keyfile, 
+                           owner=self.certhost.owneruser, 
+                           group=self.certhost.ownergroup,
+                           mode=600)
+        except Exception, e:
+            self.log.error('[%s:%s] Error fixing permissions on %s on remote host.'% (self.certhost.hostname,
+                                                                                      self.certhost.service, 
+                                                                                      self.certhost.certfile ))        
+        self.log.debug('[%s:%s] End.'% ( self.certhost.hostname, self.certhost.service))               
+
+
+
+    def putCertificateOld(self):
+        self.log.debug('[%s:%s] Start...'% ( self.certhost.hostname, self.certhost.service))
+        
+        try:
+            self.putFile(  self.certhost.tempcertfile,
+                            self.certhost.certfile)                
+        except Exception, e:
+            self.log.error('[%s:%s] Error copying certfile to %s on remote host.'% (self.certhost.hostname,
+                                                                                    self.certhost.service, 
+                                                                                 self.certhost.certfile ))
+        # Set perms on cert
+        try:
+            self.setPerms(self.certhost.certfile, 
+                           owner=self.certhost.owneruser, 
+                           group=self.certhost.ownergroup)
+        except Exception, e:
+            self.log.error('[%s:%s] Error fixing permissions on %s on remote host.'% (self.certhost.hostname,
+                                                                                    self.certhost.service,
+                                                                                    self.certhost.certfile )) 
+        
         # Move <keyfile>.new to <keyfile>
         try:
             cmd = "mv -f %s.new %s" % ( self.certhost.keyfile, self.certhost.keyfile)
@@ -133,7 +175,8 @@ class SshIOPlugin(CertifyIOInterface):
             self.log.error('[%s:%s] Error fixing permissions on %s on remote host.'% (self.certhost.hostname,
                                                                                     self.certhost.service, 
                                                                                  self.certhost.certfile ))        
-        self.log.debug('[%s:%s] End.'% ( self.certhost.hostname, self.certhost.service))               
+        self.log.debug('[%s:%s] End.'% ( self.certhost.hostname, self.certhost.service))  
+
 
 
     def getRequest(self):
@@ -295,6 +338,21 @@ class SshIOPlugin(CertifyIOInterface):
         self.log.debug("[%s:%s] Remote command output: %s" % (self.certhost.hostname,
                                                               self.certhost.service,
                                                               output.strip()))  
+        # Adjust mode
+        cmd = 'ssh -n -f -q %s@%s "chmod %s %s " ' % ( self.loginuser,
+                                                       self.certhost.hostname,
+                                                       mode,
+                                                       path  )
+        self.log.debug("[%s:%s] Executing remote command: %s" % (self.certhost.hostname,
+                                                                 self.certhost.service,
+                                                                 cmd))
+        (status, output) = commands.getstatusoutput(cmd)
+        self.log.debug("[%s:%s] Remote command output: %s" % (self.certhost.hostname,
+                                                              self.certhost.service,
+                                                              output.strip())) 
+                
+        
+        
         self.log.debug('[%s:%s] Done.'% (self.certhost.hostname, self.certhost.service))
          
  
