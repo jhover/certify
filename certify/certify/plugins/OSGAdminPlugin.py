@@ -149,6 +149,7 @@ and the osg-cert-request command to be in the PATH.'''
             keyfilename = "%s-key.pem" % (self.certhost.hostname)            
         self.certhost.tempcertfile = "%s%s" % (self.certhost.temproot, certfilename) 
         self.certhost.tempkeyfile = "%s%s" % (self.certhost.temproot, keyfilename) 
+        
         self.log.debug("[%s:%s] Reset temp cert filename: %s" % (self.certhost.hostname,
                                                                  self.certhost.service,
                                                                  self.certhost.tempcertfile                                                                 
@@ -169,13 +170,13 @@ and the osg-cert-request command to be in the PATH.'''
     def newCertificate(self):
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) )  
         self.submitRequest()
-        self.retrieveCertificate()
+        #self.retrieveCertificate()
         self.log.debug("[%s:%s] Done." % (self.certhost.hostname, self.certhost.service) )        
         
     def renewCertificate(self):
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) )
         self.submitRequest()
-        self.retrieveCertificate()
+        #self.retrieveCertificate()
         self.log.debug("[%s:%s] Done." % (self.certhost.hostname, self.certhost.service) )
 
     def cleanup(self):
