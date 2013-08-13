@@ -146,7 +146,7 @@ and the osg-cert-request command to be in the PATH.'''
             keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.hostname)
         else:
             certfilename = "%s.pem" % (self.certhost.hostname) 
-            keyfilename = "%%s-key.pem" % (self.certhost.hostname)            
+            keyfilename = "%s-key.pem" % (self.certhost.hostname)            
         self.certhost.tempcertfile = "%s%s" % (self.certhost.temproot, certfilename) 
         self.certhost.tempkeyfile = "%s%s" % (self.certhost.temproot, keyfilename) 
         self.log.debug("[%s:%s] Reset temp cert filename: %s" % (self.certhost.hostname,
