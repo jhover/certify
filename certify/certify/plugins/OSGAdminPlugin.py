@@ -244,7 +244,7 @@ and the osg-cert-request command to be in the PATH.'''
         
         '''
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) )
-        cmd = "cd %s ; osg-gridadmin-cert-request -T " % self.certhost.temproot        
+        cmd = "osg-gridadmin-cert-request -T " % self.certhost.temproot        
         cmd += "--hostname %s " % self.certhost.commonname
         cmd += "--vo %s " % self.certhost.globalconfig.get('osgadminplugin', "vo")
         
@@ -265,7 +265,7 @@ and the osg-cert-request command to be in the PATH.'''
         # cmd += "-timeout %s " % self.certhost.globalconfig.get('OSGAdminPlugin', "timeout")                 
         #cmd = "osg-cert-request -V"
         
-        self.log.debug("[%s:%s] Command is %s" % (self.certhost.hostname, self.certhost.service, cmd) )
+        self.log.debug("[%s:%s] Command is '%s'" % (self.certhost.hostname, self.certhost.service, cmd) )
         self.log.debug("[%s:%s] Done." % (self.certhost.hostname, self.certhost.service) )
         return cmd 
 
