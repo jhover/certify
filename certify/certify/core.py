@@ -642,7 +642,12 @@ class CertifyHost(threading.Thread):
         workdir = self.globalconfig.get('global','workdir')
         workdir = os.path.expanduser(workdir)
         self.temproot = "%s/%s" % ( workdir, self.hostname )        
-        os.makedirs(self.temproot)
+        
+        try:
+            os.makedirs(self.temproot)
+        except OSError:
+            # ignore if directory already exists...
+            pass
 
         self.tempcertfile = "%s%s" % (self.temproot, self.certfile)
         self.tempreqfile = "%s%s" % (self.temproot, self.reqfile)
