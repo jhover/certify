@@ -719,9 +719,11 @@ class CertifyHost(threading.Thread):
                 self.topcertify.incrementRenewed()
                 self._notifyreplacement()
         except Exception, e:
-            self.log.error("[%s:%s] Serious error. Aborting. Message: %s " % (self.hostname,
-                                                                                                                    self.service, 
-                                                                                                                    e))
+            self.log.error("[%s:%s] Serious error. Aborting. Message: %s Exception: %s" % (self.hostname,
+                                                                              self.service,
+                                                                              e,
+                                                                               traceback.format_exc()
+                                                                              ))
             self.topcertify.incrementError()
             #lstraceback.print_exc(file=sys.stdout)
         
