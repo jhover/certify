@@ -4,6 +4,7 @@ import sys
 import commands
 import getpass
 import tempfile
+import threading
 
 try:
     import pexpect
@@ -15,6 +16,10 @@ except ImportError:
 from certify.core import CertifyAdminInterface
 
 class OSGAdminPlugin(CertifyAdminInterface):
+    
+    # Used to control access to the process current working directory. 
+    # The OSG grid admin command puts files in the current dir. 
+    cwdlock = threading.Lock()
     
     def getPassphrase(cls):
         '''
@@ -104,7 +109,6 @@ and the osg-cert-request command to be in the PATH.'''
         self.certhost.tempkeyfile = "%s/%s" % (self.certhost.temproot, keyfilename) 
                 
         # If it exists, remove current cert file from temp (since we're about to make a new one).
-
         try:
             os.remove(self.certhost.tempcertfile)
         except OSError:
@@ -115,16 +119,28 @@ and the osg-cert-request command to be in the PATH.'''
                                                        self.certhost.service,
                                                        self.certhost.temproot
                                                        ))
-        os.chdir(self.certhost.temproot)
-        cmd = self._buildGridadminCommand()       
-        self.log.info("[%s:%s] Running request command..." % (self.certhost.hostname,
+        cmd = self._buildGridadminCommand() 
+        
+        # We need to acquire lock so that the following block can only occur in one thread at a time. 
+        self.log.debug("[%s:%s] Acquiring cwd lock." % (self.certhost.hostname,
                                                               self.certhost.service) )
-        process = pexpect.spawn(cmd, timeout=300)
-        process.expect([".pem':"])
-        self.log.debug("[%s:%s] Providing passphrase to command..."% (self.certhost.hostname, 
-                                                                      self.certhost.service))
-        process.sendline(self.passphrase)
-        process.expect([pexpect.EOF])
+        OSGAdminPlugin.cwdlock.acquire()
+        try:
+            os.chdir(self.certhost.temproot)
+                  
+            self.log.info("[%s:%s] Running request command..." % (self.certhost.hostname,
+                                                                  self.certhost.service) )
+            process = pexpect.spawn(cmd, timeout=300)
+            process.expect([".pem':"])
+            self.log.debug("[%s:%s] Providing passphrase to command..."% (self.certhost.hostname, 
+                                                                          self.certhost.service))
+            process.sendline(self.passphrase)
+            process.expect([pexpect.EOF])
+            self.log.debug("[%s:%s] Releasing cwd lock." % (self.certhost.hostname,
+                                                                  self.certhost.service) )
+        except Exception:
+            pass
+        OSGAdminPlugin.cwdlock.release()        
         self.log.debug("[%s:%s] Command output: %s"% (self.certhost.hostname, 
                                                       self.certhost.service, 
                                                       process.before.strip() )  ) 
@@ -145,7 +161,9 @@ and the osg-cert-request command to be in the PATH.'''
         self.log.debug("[%s:%s] Reset temp key filename: %s" % (self.certhost.hostname,
                                                                  self.certhost.service,
                                                                  self.certhost.tempkeyfile                                                                 
-                                                                 ))        
+                                                                 ))
+        
+        
         
     def retrieveCertificate(self):
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) ) 
@@ -171,7 +189,22 @@ and the osg-cert-request command to be in the PATH.'''
         Cleans up local temporary files for this host.
         '''
         self.log.debug("[%s:%s] Begin..." % ( self.certhost.hostname, self.certhost.service))
-        
+                # Set temp filenames correctly
+        if self.certhost.svcprefix:
+            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.hostname) 
+            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.hostname)
+        else:
+            certfilename = "%s.pem" % (self.certhost.hostname) 
+            keyfilename = "%s-key.pem" % (self.certhost.hostname)            
+        self.certhost.tempcertfile = "%s/%s" % (self.certhost.temproot, certfilename) 
+        self.certhost.tempkeyfile = "%s/%s" % (self.certhost.temproot, keyfilename) 
+                
+        # If it exists, remove current cert file from temp (since we're about to make a new one).
+        try:
+            os.remove(self.certhost.tempcertfile)
+            os.remove(self.certhost.tempkeyfile)
+        except OSError:
+            pass
         self.log.debug("[%s:%s] Done." % ( self.certhost.hostname, self.certhost.service))
 
         

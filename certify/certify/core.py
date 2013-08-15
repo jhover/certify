@@ -742,9 +742,7 @@ class CertifyHost(threading.Thread):
         self.adminplugin.newCertificate()
         self.log.debug("[%s:%s] CertifyHost.certificate is %s."% (self.hostname, self.service, self.certificate))
         self.log.info("[%s:%s] Putting certificate to host/filesystem."% (self.hostname,self.service))
-        self.ioplugin.putCertificate()
-        
-                
+        self.ioplugin.putCertificate()                
         self.log.debug("[%s:%s] Done."% (self.hostname,self.service))
 
     def _send_message(self, subject, messagestring):
