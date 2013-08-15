@@ -23,7 +23,7 @@ from certify.core import CertifyCertInterface
 
 class NullCertPlugin(CertifyCertInterface):
     '''
-     Uses the openssl command line program to handle certificates. But do not create requests.  
+     Uses the openssl command line program to handle certificates. But does not create requests.  
     
     '''
       
@@ -164,8 +164,7 @@ class NullCertPlugin(CertifyCertInterface):
         except Exception:
             pass
         return True
-    
-    
+      
     
                       
     def getExpirationUTC(self):

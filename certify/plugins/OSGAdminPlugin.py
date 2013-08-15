@@ -93,42 +93,30 @@ and the osg-cert-request command to be in the PATH.'''
                  
         '''
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) )
+        # Set temp filenames correctly
+        if self.certhost.svcprefix:
+            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.hostname) 
+            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.hostname)
+        else:
+            certfilename = "%s.pem" % (self.certhost.hostname) 
+            keyfilename = "%s-key.pem" % (self.certhost.hostname)            
+        self.certhost.tempcertfile = "%s/%s" % (self.certhost.temproot, certfilename) 
+        self.certhost.tempkeyfile = "%s/%s" % (self.certhost.temproot, keyfilename) 
+                
         # If it exists, remove current cert file from temp (since we're about to make a new one).
-        # self.certhost.tempcertfile
+
         try:
             os.remove(self.certhost.tempcertfile)
         except OSError:
             pass
               
-        
         # change working directory to tmproot
         self.log.debug("[%s:%s] Changing dir to %s" % (self.certhost.hostname, 
                                                        self.certhost.service,
                                                        self.certhost.temproot
                                                        ))
         os.chdir(self.certhost.temproot)
-        
-        # build command
-        cmd = self._buildGridadminCommand() 
-       
-        
-        # run it using pexpect        
-        #
-        #  Please enter the pass phrase for '/home/jhover/.globus/userkey.pem':
-        #Connection object created.
-        # About to make request to https://oim.grid.iu.edu:443/oim/rest?action=user_info
-        # About to get response...
-        # Waiting for response from Quota Check API. Please wait.
-        # Beginning request process for griddev02.racf.bnl.gov
-        # Generating certificate...
-        # Id is: 1129
-        # Connecting to server to approve certificate...
-        # Issuing certificate...
-        # . 
-        # Certificate written to ./griddev02.racf.bnl.gov.pem
-        #
-        #
-
+        cmd = self._buildGridadminCommand()       
         self.log.info("[%s:%s] Running request command..." % (self.certhost.hostname,
                                                               self.certhost.service) )
         process = pexpect.spawn(cmd, timeout=300)
@@ -158,7 +146,6 @@ and the osg-cert-request command to be in the PATH.'''
                                                                  self.certhost.service,
                                                                  self.certhost.tempkeyfile                                                                 
                                                                  ))        
-        
         
     def retrieveCertificate(self):
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) ) 
@@ -254,20 +241,6 @@ and the osg-cert-request command to be in the PATH.'''
         self.log.debug("[%s:%s] Done." % (self.certhost.hostname, self.certhost.service) )
         return cmd 
 
-    #def _makePassfile(self):
-    #    (fd,pathname) = tempfile.mkstemp(".tmp", "pp", self.certhost.workdir)      
-    #    self.passfile = pathname
-    #    self.log.debug("[%s:%s] File descriptor=%s  File path=%s" % (self.certhost.hostname, 
-    #                                                                 self.certhost.service,
-    #                                                                 fd,
-    #                                                                 self.passfile) )
-    #    f=os.fdopen(fd, 'w')
-    #    f.write(self.passphrase)
-    #    f.close()
-        
-    
-    #def _deletePassfile(self):
-    #    os.remove(self.passfile)
 
 '''
    The following is necessary to trigger passphrase input on initial import, not just when class is instantiated 

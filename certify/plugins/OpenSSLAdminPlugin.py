@@ -138,7 +138,6 @@ class OpenSSLAdminPlugin(CertifyAdminInterface):
         
         '''
         self.log.debug('[%s:%s] Start...'% (self.certhost.hostname, self.certhost.service))
-        
         self.log.debug('[%s:%s] Done.'% (self.certhost.hostname, self.certhost.service)) 
     
                     
