@@ -558,7 +558,7 @@ class CertifyCertInterface(object):
     def getExpirationUTC(self):
         raise NotImplementedError
     
-    def createRequest(self):
+    def makeRequest(self):
         raise NotImplementedError
 
     def cleanup(self):
