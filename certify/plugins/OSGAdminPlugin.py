@@ -122,9 +122,9 @@ and the osg-cert-request command to be in the PATH.'''
         cmd = self._buildGridadminCommand() 
         
         # We need to acquire lock so that the following block can only occur in one thread at a time. 
-        self.log.debug("[%s:%s] Acquiring cwd lock." % (self.certhost.hostname,
-                                                              self.certhost.service) )
         OSGAdminPlugin.cwdlock.acquire()
+        self.log.debug("[%s:%s] Acquired cwd lock." % (self.certhost.hostname,
+                                                              self.certhost.service) )
         try:
             os.chdir(self.certhost.temproot)
                   
@@ -136,10 +136,11 @@ and the osg-cert-request command to be in the PATH.'''
                                                                           self.certhost.service))
             process.sendline(self.passphrase)
             process.expect([pexpect.EOF])
-            self.log.debug("[%s:%s] Releasing cwd lock." % (self.certhost.hostname,
-                                                                  self.certhost.service) )
+            
         except Exception:
             pass
+        self.log.debug("[%s:%s] Releasing cwd lock." % (self.certhost.hostname,
+                                                                  self.certhost.service) )
         OSGAdminPlugin.cwdlock.release()        
         self.log.debug("[%s:%s] Command output: %s"% (self.certhost.hostname, 
                                                       self.certhost.service, 
