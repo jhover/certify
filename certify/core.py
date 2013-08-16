@@ -19,6 +19,8 @@ try:
 except:
     from email.MIMEText import MIMEText
 
+__version__ = "0.9.2"
+
 class Certify(object):
     '''
     Top-level program object. Contains configs, lists of all hosts, and a ThreadManager to run.
