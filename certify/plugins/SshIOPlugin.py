@@ -46,6 +46,12 @@ class SshIOPlugin(CertifyIOInterface):
         self.loginuser = self.certhost.globalconfig.get('sshioplugin','loginuser')
         self.log.debug("[%s:%s] Done." % ( self.certhost.hostname, self.certhost.service )) 
 
+    def __str__(self):
+        s = "SshIOPlugin [%s:%s]: " % (self.certhost.hostname, self.certhost.service)
+        s += "connecttimeout=%s " % self.connecttimeout
+        s += "loginuser=%s" % self.loginuser
+        return s
+
     def checkAccess(self):
         '''
            In this context, check to be sure we are allowed to connect to the host. 

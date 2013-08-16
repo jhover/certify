@@ -50,6 +50,12 @@ class OpenSSLAdminPlugin(CertifyAdminInterface):
         self._getCACert()
         self.log.debug('[%s:%s] Init done.'% (self.certhost.hostname, self.certhost.service))
 
+    def __str__(self):
+        s = "OpenSSLAdminPlugin [%s:%s]: " % (self.certhost.hostname, self.certhost.service)
+        s += "temptargetdir=%s " % self.temptargetdir
+        return s
+
+
     def submitRequest(self):
         #self.submitRequestPyOpenSSL()
         self.submitRequestOpenSSL()

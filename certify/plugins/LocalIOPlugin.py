@@ -57,6 +57,13 @@ class LocalIOPlugin(CertifyIOInterface):
                                                          self.certhost.reqfile))
         self.log.debug("[%s] Done." % self.certhost.hostname ) 
 
+    def __str__(self):
+        s = "LocalIOPlugin [%s:%s]: " % (self.certhost.hostname, self.certhost.service)
+        s += "targetroot=%s " % self.targetroot
+        return s
+
+
+
     def checkAccess(self):
         '''
         No need to verify connectivity for local.

@@ -42,6 +42,9 @@ class OpenSSLCertPlugin(CertifyCertInterface):
         self.sslconffile="%s/%sssl.conf" % ( self.certdir, self.certhost.service )
         self.log.debug("[%s:%s] Done." % ( self.certhost.hostname, self.certhost.service))
 
+    def __str__(self):
+        s = "OpenSSLCertPlugin [%s:%s]: " % (self.certhost.hostname, self.certhost.service)
+        return s
             
     def loadCertificate(self):
         '''
