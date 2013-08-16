@@ -664,16 +664,21 @@ class CertifyHost(threading.Thread):
         self.keypair = None # X509 PKey object.
         self.request = None # X509 object
         
-        # Load Plugin classes    
+        # Load Plugin classes
+        self.log.debug("[%s:%s] Loading ioplugin..." % (host, service))    
         ioklass = self._get_class_object(config, section, 'ioclass')
         self.ioplugin = ioklass(self)
+        self.log.debug("[%s:%s] Loaded io plugin %s" % (host, service, self.ioplugin))
         
+        self.log.debug("[%s:%s] Loading cert plugin..." % (host, service)) 
         cklass = self._get_class_object(config, section, 'certclass')
         self.certplugin = cklass(self) 
-
+        self.log.debug("[%s:%s] Loaded cert plugin %s" % (host, service, self.certplugin))
+         
         aklass =  self._get_class_object(config, section, 'adminclass')
         self.adminplugin = aklass(self)
-        
+        self.log.debug("[%s:%s] Loaded admin plugin %s" % (host, service, self.adminplugin))
+        self.log.debug("[%s:%s] All plugins loaded." % (host, service)) 
         self.log.debug("[%s:%s] Done."% (host, service))    
 
 

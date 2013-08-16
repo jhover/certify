@@ -37,6 +37,11 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
         (self.certdir, basename) = os.path.split(self.certhost.certfile)
         self.log.debug("[%s:%s] Done." % ( self.certhost.hostname, self.certhost.service))
 
+
+    def __str__(self):
+        s = "NoReqOpenSSLCertPlugin [%s:%s]: " % (self.certhost.hostname, self.certhost.service)
+        return s
+
             
     def loadCertificate(self):
         '''
