@@ -26,8 +26,8 @@ class OSGAdminPlugin(CertifyAdminInterface):
         self.log = logging.getLogger()
         self.certhost = certhost
         self.log.debug("[%s:%s] Begin..." % ( self.certhost.hostname, self.certhost.service))  
-        self.testmode = self.certhost.config.getboolean(self.certhost.hostname, 'osgadmin.testmode')
-        self.vo = self.certhost.config.get(self.certhost.hostname, 'osgadmin.vo')
+        self.testmode = self.certhost.globalconfig.getboolean('osgadminplugin', 'testmode')
+        self.vo = self.certhost.globalconfig.get('osgadminplugin', 'vo')
     
     def getPassphrase(cls):
         '''
