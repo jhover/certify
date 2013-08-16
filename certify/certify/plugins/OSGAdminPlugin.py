@@ -34,11 +34,11 @@ class OSGAdminPlugin(CertifyAdminInterface):
         self.log.debug("[%s:%s] OSGAdminPlugin() Overriding default local tempfile names..." % ( self.certhost.hostname, 
                                                                                                  self.certhost.service))
         if self.certhost.svcprefix:
-            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.hostname) 
-            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.hostname)
+            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.certhostname) 
+            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.certhostname)
         else:
-            certfilename = "%s.pem" % (self.certhost.hostname) 
-            keyfilename = "%s-key.pem" % (self.certhost.hostname)            
+            certfilename = "%s.pem" % (self.certhost.certhostname) 
+            keyfilename = "%s-key.pem" % (self.certhost.certhostname)            
         self.certhost.tempcertfile = "%s/%s" % (self.certhost.temproot, certfilename) 
         self.certhost.tempkeyfile = "%s/%s" % (self.certhost.temproot, keyfilename)
         
@@ -122,11 +122,11 @@ and the osg-cert-request command to be in the PATH.'''
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) )
         # Set temp filenames correctly
         if self.certhost.svcprefix:
-            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.hostname) 
-            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.hostname)
+            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.certhostname) 
+            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.certhostname)
         else:
-            certfilename = "%s.pem" % (self.certhost.hostname) 
-            keyfilename = "%s-key.pem" % (self.certhost.hostname)            
+            certfilename = "%s.pem" % (self.certhost.certhostname) 
+            keyfilename = "%s-key.pem" % (self.certhost.certhostname)            
         self.certhost.tempcertfile = "%s/%s" % (self.certhost.temproot, certfilename) 
         self.certhost.tempkeyfile = "%s/%s" % (self.certhost.temproot, keyfilename) 
                 
@@ -169,11 +169,11 @@ and the osg-cert-request command to be in the PATH.'''
                                                       process.before.strip() )  ) 
         
         if self.certhost.svcprefix:
-            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.hostname) 
-            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.hostname)
+            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.certhostname) 
+            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.certhostname)
         else:
-            certfilename = "%s.pem" % (self.certhost.hostname) 
-            keyfilename = "%s-key.pem" % (self.certhost.hostname)            
+            certfilename = "%s.pem" % (self.certhost.certhostname) 
+            keyfilename = "%s-key.pem" % (self.certhost.certhostname)            
         self.certhost.tempcertfile = "%s/%s" % (self.certhost.temproot, certfilename) 
         self.certhost.tempkeyfile = "%s/%s" % (self.certhost.temproot, keyfilename) 
         
@@ -214,11 +214,11 @@ and the osg-cert-request command to be in the PATH.'''
         self.log.debug("[%s:%s] Begin..." % ( self.certhost.hostname, self.certhost.service))
                 # Set temp filenames correctly
         if self.certhost.svcprefix:
-            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.hostname) 
-            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.hostname)
+            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.certhostname) 
+            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.certhostname)
         else:
-            certfilename = "%s.pem" % (self.certhost.hostname) 
-            keyfilename = "%s-key.pem" % (self.certhost.hostname)            
+            certfilename = "%s.pem" % (self.certhost.certhostname) 
+            keyfilename = "%s-key.pem" % (self.certhost.certhostname)            
         self.certhost.tempcertfile = "%s/%s" % (self.certhost.temproot, certfilename) 
         self.certhost.tempkeyfile = "%s/%s" % (self.certhost.temproot, keyfilename) 
                 
