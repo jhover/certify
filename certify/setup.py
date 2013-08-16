@@ -1,17 +1,12 @@
 #!/usr/bin/env python
 #
-# Setup prog for VOMSAdmin Library
-#
-#
+# Setup prog for Certify certificate management utility
 
 import sys
 from distutils.core import setup
 
-# For now, don't forget to increment this in certify-binary.py
-release_version='0.9.2'
-
-# Re-write version string in certify-binary.py
-#f = open('./certify/certify-binary.py' ,'w')
+from certify import core
+release_version=core.__version__
 
 setup(
     name="certify",
