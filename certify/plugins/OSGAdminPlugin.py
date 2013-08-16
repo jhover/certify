@@ -21,6 +21,14 @@ class OSGAdminPlugin(CertifyAdminInterface):
     # The OSG grid admin command puts files in the current dir. 
     cwdlock = threading.Lock()
     
+    def __init__(self, certhost):
+        super(OSGAdminPlugin, self).__init__(certhost)
+        self.log = logging.getLogger()
+        self.certhost = certhost
+        self.log.debug("[%s:%s] Begin..." % ( self.certhost.hostname, self.certhost.service))  
+        self.testmode = self.certhost.config.getboolean(self.certhost.hostname, 'osgadmin.testmode')
+        self.vo = self.certhost.config.get(self.certhost.hostname, 'osgadmin.vo')
+    
     def getPassphrase(cls):
         '''
         This is necessary to avoid the user having to type in their cert password for
@@ -268,13 +276,12 @@ and the osg-cert-request command to be in the PATH.'''
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) )
         cmd = "osg-gridadmin-cert-request "        
         cmd += "--hostname %s " % self.certhost.commonname
-        cmd += "--vo %s " % self.certhost.globalconfig.get('osgadminplugin', "vo")
-        
-       
+        cmd += "--vo %s " % self.vo
+        if self.testmode:
+            cmd += "-T " 
         self.log.debug("[%s:%s] Command is '%s'" % (self.certhost.hostname, self.certhost.service, cmd) )
         self.log.debug("[%s:%s] Done." % (self.certhost.hostname, self.certhost.service) )
         return cmd 
-
 
 '''
    The following is necessary to trigger passphrase input on initial import, not just when class is instantiated 
