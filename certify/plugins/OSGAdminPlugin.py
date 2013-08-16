@@ -31,6 +31,17 @@ class OSGAdminPlugin(CertifyAdminInterface):
                                               self.certhost.service))           
         self.testmode = self.certhost.globalconfig.getboolean('osgadminplugin', 'testmode')
         self.vo = self.certhost.globalconfig.get('osgadminplugin', 'vo')
+        self.log.debug("[%s:%s] OSGAdminPlugin() Overriding default local tempfile names..." % ( self.certhost.hostname, 
+                                                                                                 self.certhost.service))
+        if self.certhost.svcprefix:
+            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.hostname) 
+            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.hostname)
+        else:
+            certfilename = "%s.pem" % (self.certhost.hostname) 
+            keyfilename = "%s-key.pem" % (self.certhost.hostname)            
+        self.certhost.tempcertfile = "%s/%s" % (self.certhost.temproot, certfilename) 
+        self.certhost.tempkeyfile = "%s/%s" % (self.certhost.temproot, keyfilename)
+        
         self.log.debug("[%s:%s] OSGAdminPlugin initialized: testmode=%s vo=%s" % ( self.certhost.hostname, 
                                                                                    self.certhost.service,
                                                                                    self.testmode,
