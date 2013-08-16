@@ -20,11 +20,15 @@ class OSGAdminPlugin(CertifyAdminInterface):
     # Used to control access to the process current working directory. 
     # The OSG grid admin command puts files in the current dir. 
     cwdlock = threading.Lock()
-    
+
+  
     def __init__(self, certhost):
         super(OSGAdminPlugin, self).__init__(certhost)
         self.log = logging.getLogger()
         self.log.debug("[%s:%s] OSGAdminPlugin() Begin..." % ( self.certhost.hostname, self.certhost.service))  
+        self.passphrase = OSGAdminPlugin.getPassphrase()
+        self.log.debug("[%s:%s] Passphrase set from user input."% (self.certhost.hostname, 
+                                              self.certhost.service))           
         self.testmode = self.certhost.globalconfig.getboolean('osgadminplugin', 'testmode')
         self.vo = self.certhost.globalconfig.get('osgadminplugin', 'vo')
         self.log.debug("[%s:%s] OSGAdminPlugin initialized: testmode=%s vo=%s" % ( self.certhost.hostname, 
@@ -86,17 +90,7 @@ class OSGAdminPlugin(CertifyAdminInterface):
     checkPassphrase=classmethod(checkPassphrase)
     
     
-    def __init__(self, certhost):
-        super(OSGAdminPlugin, self).__init__(certhost)
-        self.log = logging.getLogger()
-        self.log.debug("[%s:%s] Init..."% (self.certhost.hostname, 
-                                              self.certhost.service)) 
-        
-        self.passphrase = OSGAdminPlugin.getPassphrase()  
-        self.log.debug("[%s:%s] Passphrase set from user input."% (self.certhost.hostname, 
-                                              self.certhost.service))           
-        self.log.debug("[%s:%s] Init Done"% (self.certhost.hostname, 
-                                              self.certhost.service)) 
+
                 
     def _check_gridadmin_command(self):
         cmd = "which osg-gridadmin-cert-request"
