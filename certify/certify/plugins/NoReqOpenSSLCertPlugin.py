@@ -21,25 +21,20 @@ except ImportError:
     
 from certify.core import CertifyCertInterface
 
-class NullCertPlugin(CertifyCertInterface):
+class NoReqOpenSSLCertPlugin(CertifyCertInterface):
     '''
      Uses the openssl command line program to handle certificates. But does not create requests.  
     
     '''
       
     def __init__(self, certhost):
-        super(NullCertPlugin, self).__init__(certhost)
+        super(NoReqOpenSSLCertPlugin, self).__init__(certhost)
         self.log = logging.getLogger()
         self.certhost = certhost
         self.log.debug("[%s:%s] Begin..." % ( self.certhost.hostname, self.certhost.service))
-        self.certhost = certhost
         self.pkey = None  # X509.PKey object
-        self.tempsslconffile="%s%s/%sssl.conf" % (self.certhost.temproot, 
-                                               self.certhost.targetdir, 
-                                               self.certhost.service )
         # Put the ssl conf file wherever the cert file will go:
         (self.certdir, basename) = os.path.split(self.certhost.certfile)
-        self.sslconffile="%s/%sssl.conf" % ( self.certdir, self.certhost.service )
         self.log.debug("[%s:%s] Done." % ( self.certhost.hostname, self.certhost.service))
 
             
@@ -189,29 +184,8 @@ class NullCertPlugin(CertifyCertInterface):
         else:
             self.log.error("[%s:%s] Something horribly wrong with OpenSSL date output: %s" % (self.certhost.hostname,self.certhost.service,  nastr))
                
-               
-    def _loadRequest(self):
-        '''
-        However necessary, read request into self.certhost.request
-        
-        '''
-        self.log.debug("[%s:%s] Begin..." % ( self.certhost.hostname, self.certhost.service))
-        if os.path.exists(self.certhost.tempreqfile):
-            self.log.debug("[%s:%s] Loading request from %s" % (self.certhost.hostname, self.certhost.service, 
-                                                             self.certhost.tempreqfile))
-            self._reqbuffer = open(self.certhost.tempreqfile).read()
-            #self.log.debug("[%s:%s] Request buffer is %s" % (self.certhost.hostname,self.certhost.service, 
-            #                                              self._reqbuffer))
-            self.certhost.request = crypto.load_certificate_request(crypto.FILETYPE_PEM, 
-                                                                    self._reqbuffer)
-            
-            #self.log.debug('[%s:%s] Loaded request object is %s' % (self.certhost.hostname,self.certhost.service, 
-            #                                                     self.certhost.request))
-        else:
-            self.log.debug("[%s:%s] Request file not found at %s." % (self.certhost.hostname, self.certhost.service, 
-                                                                   self.certhost.tempreqfile))
-            self.certhost.request = None    
-          
+              
+         
     def cleanup(self):
         '''
         Cleans up local temporary files for this host.
@@ -232,100 +206,8 @@ class NullCertPlugin(CertifyCertInterface):
         '''
         self.log.debug("[%s:%s] Start..." % ( self.certhost.hostname, self.certhost.service))      
         self._createCertDir()
-        #self._createRandomFile()
-        #self._createSslConf()
-        #self._copySslConf()
-        #self._createRequest()
-        #self._retrieveRequest()
-        #self._loadRequest()
-        #self._removeRandomFile()
         self.log.debug("[%s:%s] Done." % ( self.certhost.hostname, self.certhost.service))        
-        
-        
-    def _createRandomFile(self):
-        '''
-        Create randomfile on host, fill it with text...
-        
-        '''
-        self.log.debug("[%s:%s] Start..." % ( self.certhost.hostname, self.certhost.service))
-        (status,output) = self.certhost.ioplugin.executeCommand("mktemp")
-        self.randomfile = output.strip()
-        self.log.debug("[%s:%s] Making randomfile %s" % ( self.certhost.hostname, 
-                                                   self.certhost.service,
-                                                   self.randomfile))
-        cmd = "/bin/date > %s; ps aux >> %s ; ls -ln /tmp >> %s" % ( self.randomfile, self.randomfile, self.randomfile)
-        self.certhost.ioplugin.executeCommand(cmd)
-        self.log.debug("[%s:%s] Done." % ( self.certhost.hostname, self.certhost.service))
-    
-    def _createSslConf(self):
-        '''
-        Makes a new OpenSSL conf file for this service/host from template.
-        
-        '''
-        self.log.debug('[%s:%s] Start...'% (self.certhost.hostname, self.certhost.service))
-        (path, basename) = os.path.split(self.tempsslconffile)
-        if not os.path.exists(path):
-            os.makedirs(path)
-        out_file = open(self.tempsslconffile, "w")
-        sslconftxt = '''RANDFILE = %s
-policy = policy_match
-
-[ req ]
-default_bits = 2048
-default_keyfile = %s
-distinguished_name = req_distinguished_name
-attributes = req_attributes
-encrypt_key = no
-prompt = no
-req_extensions = v3_req
-
-[ req_attributes ]
-
-[ req_distinguished_name ]
-1.DC = org
-2.DC = doegrids
-OU = Services
-CN = %s
-
-[ x509v3_extensions ]
-nsCertType = 0x40
-
-[ v3_req ]
-subjectAltName = %s
-
-''' % (self.randomfile, 
-       self.certhost.keyfile, 
-       self.certhost.commonname, 
-       self.certhost.subjectaltnames)         
-        out_file.write(sslconftxt)
-        out_file.close()
-        self.log.debug('[%s:%s] Done.'% (self.certhost.hostname, self.certhost.service))
-
-
-    def _copySslConf(self):
-        self.log.debug('[%s:%s] Copying SSL Conf file.'% (self.certhost.hostname, 
-                                                                  self.certhost.service,
-                                                                  ))
-        self.certhost.ioplugin.putFile(self.tempsslconffile, self.sslconffile)
-        self.log.debug('[%s:%s] Done.'% (self.certhost.hostname, self.certhost.service))
-    
-    
-    def _createRequest(self):
-        '''
-        Creates request and puts keyfile in <keyfilename>.new
-        
-        
-        '''
-        self.log.debug('[%s:%s] Start...'% (self.certhost.hostname, self.certhost.service))
-        cmd = "openssl req  -new -config %s -out %s -keyout %s.pk8.new; openssl rsa -in %s.pk8.new -out %s.new ; chmod 400 %s.new ; rm -f %s.pk8.new " % (self.sslconffile,
-                                                                       self.certhost.reqfile,
-                                                                       self.certhost.keyfile,
-                                                                       self.certhost.keyfile,
-                                                                       self.certhost.keyfile,
-                                                                       self.certhost.keyfile,
-                                                                       self.certhost.keyfile)
-        self.certhost.ioplugin.executeCommand(cmd)
-        self.log.debug('[%s:%s] Done.'% (self.certhost.hostname, self.certhost.service))
+               
 
     def _createCertDir(self):
         self.log.debug('[%s:%s] Making certificate dir %s'% (self.certhost.hostname, 
@@ -334,66 +216,5 @@ subjectAltName = %s
         self.certhost.ioplugin.makeDir(self.certdir)
         self.log.debug('[%s:%s] Done.'% (self.certhost.hostname, self.certhost.service))
 
-    def _retrieveRequest(self):
-        self.log.debug('[%s:%s] Retrieving request %s. '% (self.certhost.hostname, 
-                                                           self.certhost.service,
-                                                           self.certhost.reqfile))
-        self.certhost.ioplugin.getRequest()
-        self.log.debug('[%s:%s] Done.'% (self.certhost.hostname, self.certhost.service))  
-    
-    def _removeRandomFile(self):
-        self.log.debug('[%s:%s] Removing random file %s'% (self.certhost.hostname, 
-                                                           self.certhost.service,
-                                                           self.randomfile))
-        self.certhost.ioplugin.removeFile(self.randomfile)
-        self.log.debug('[%s:%s] Done.'% (self.certhost.hostname, self.certhost.service))
-  
 
-
-
-
-    def _createSslConfX(self):
-        '''
-        Makes a new OpenSSL conf file for this service/host from template.
-        
-        This version includes subjectAltName(s)
-        
-        '''
-        out_file = open(self.tmpsslconffile, "w")
-        sslconftxt = '''RANDFILE = %s
-policy = policy_match
-[ req ]
-default_bits = 2048
-default_keyfile = %s
-distinguished_name = req_distinguished_name
-attributes = req_attributes
-encrypt_key = no
-prompt = no
-x509_extensions = v3_ca
-req_extensions = v3_req
-
-[ req_attributes ]
-[ req_distinguished_name ]
-1.DC = org
-2.DC = doegrids
-OU = Services
-CN = %s
-
-[ x509v3_extensions ]
-nsCertType = 0x40
-
-[ v3_req ]
-subjectAltNames = %s
-''' % (self.randomfile, 
-       self.certhost.targetkey, 
-       self.certhost.commonname,
-       self.certhost.subjectaltnames)         
-        out_file.write(sslconftxt)
-        out_file.close()
-
-
-
-
-
-
-
+ 
