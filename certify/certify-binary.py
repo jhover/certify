@@ -17,6 +17,7 @@ from ConfigParser import ConfigParser
 (libpath,tail) = os.path.split(sys.path[0])
 sys.path.append(libpath)
 
+from certify import core
 from certify.core import Certify
 
 debug = 0
@@ -28,7 +29,7 @@ config_file = None
 hostsuri_override= None
 default_configfile = os.path.expanduser("~/.certify/certify.conf")
 logfile = None
-version=certify.core.__version__
+version=core.__version__
 
 usage = """Usage: main.py [OPTIONS]  
 OPTIONS: 
