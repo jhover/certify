@@ -112,8 +112,9 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
         '''
         aaa = self._validateCommonName()
         bbb = self._validateCertPair()
+        ccc = self._validateCA()
         
-        if aaa and bbb:
+        if aaa and bbb and ccc:
             return True
         else:
             return False
@@ -148,6 +149,37 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
             retval=False
         self.log.debug("[%s:%s] Done." % ( self.certhost.hostname, self.certhost.service))
         return retval
+    
+    def _validateCA(self):
+        '''
+        Checks to be sure that the CA (Issuer CommonName) of the current certificate for host is in fact 
+        what is specified by hosts.conf. 
+        e.g., 
+        
+        DC=com, DC=DigiCert-Grid, O=Open Science Grid, OU=Services, CN=acas0065.usatlas.bnl.gov
+        
+        Issuer CN: DigiCert Grid CA-1
+                
+        '''
+        caname = self.certhost.certificate.get_issuer().commonName
+        self.log.debug("[%s:%s] CA commonName is %s" % ( self.certhost.hostname, 
+                                                      self.certhost.service, 
+                                                      caname)
+                                                      )
+        if caname == self.certhost.issuercn:
+            retval=True
+            self.log.debug("[%s:%s] CA commonname '%s' matches that desired '%s'." % ( self.certhost.hostname, 
+                                                                                         self.certhost.service,
+                                                                                         caname,
+                                                                                         self.certhost.issuercn
+                                                                                         ))
+        else:
+            self.log.info("[%s:%s] CA commonname doesn't match that desired. Make new cert." % ( self.certhost.hostname, 
+                                                                                                   self.certhost.service))
+            retval=False
+        return retval
+        
+    
     
     def _validateCertPair(self):
         '''
