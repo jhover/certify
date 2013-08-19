@@ -167,5 +167,5 @@ else:
     certifyobj.execute()
 end = time.time()
 elapsed = end - start
-log.info("Process took %s" % elapsed )
+log.info("Process took %s seconds." % elapsed )
 log.debug("certify-binary.py: Done.")
