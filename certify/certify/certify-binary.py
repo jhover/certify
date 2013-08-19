@@ -10,6 +10,7 @@ import datetime
 import tempfile
 import urllib2
 import logging
+import time
 
 from ConfigParser import ConfigParser
 
@@ -149,6 +150,8 @@ if noclean:
 else:
     cp.set('global', 'noclean', 'false')
 
+start = time.time()
+
 # Handle hosturi override
 if hostsuri_override:
     log.debug("certify-binary.py: Overriding config file hostsuri with %s" % hostsuri_override)
@@ -162,4 +165,7 @@ if list:
 else:
     log.debug("certify-binary.py: Executing Certify.execute()")
     certifyobj.execute()
+end = time.time()
+elapsed = end - start
+log.info("Process took %s" % elapsed )
 log.debug("certify-binary.py: Done.")
