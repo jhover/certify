@@ -602,7 +602,12 @@ class CertifyHost(threading.Thread):
         except NoOptionError:
             self.subjectaltnames = "DNS:%s" % self.certhostname    
         
-        self.issuercn = self.config.get(section, 'issuer_cn')
+        self.issuercns = []
+        
+        cnlist = self.config.get(section, 'issuer_cns').split(',')
+        for cn in cnlist:
+            cn = cn.strip()
+            self.issuercns.append(cn)
                 
         self.service = service
         self.renewthreshold = int(self.config.get(section, 'renewthreshold'))
