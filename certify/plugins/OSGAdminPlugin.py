@@ -169,7 +169,7 @@ and the osg-cert-request command to be in the PATH.'''
                                                       self.certhost.service, 
                                                       process.before.strip() )  ) 
         
-        if os.path.exists(self.certhost.tempcertfile) and os.path.exists(self.certhost.tempkeyfile):
+        if os.path.isfile(self.certhost.tempcertfile) and os.path.isfile(self.certhost.tempkeyfile):
             self.log.debug("[%s:%s] Temp cert and key files exist at expected paths." % ( self.certhost.hostname, 
                                                       self.certhost.service))
         else:
