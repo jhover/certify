@@ -166,12 +166,12 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
                                                       self.certhost.service, 
                                                       caname)
                                                       )
-        if caname == self.certhost.issuercn:
+        if caname in self.certhost.issuercns:
             retval=True
-            self.log.debug("[%s:%s] CA commonname '%s' matches that desired '%s'." % ( self.certhost.hostname, 
+            self.log.debug("[%s:%s] CA commonname '%s' matches (one) desired '%s'." % ( self.certhost.hostname, 
                                                                                          self.certhost.service,
                                                                                          caname,
-                                                                                         self.certhost.issuercn
+                                                                                         self.certhost.issuercns
                                                                                          ))
         else:
             self.log.info("[%s:%s] CA commonname doesn't match that desired. Make new cert." % ( self.certhost.hostname, 
