@@ -41,6 +41,14 @@ class OSGAdminPlugin(CertifyAdminInterface):
             keyfilename = "%s-key.pem" % (self.certhost.certhostname)            
         self.certhost.tempcertfile = "%s/%s" % (self.certhost.temproot, certfilename) 
         self.certhost.tempkeyfile = "%s/%s" % (self.certhost.temproot, keyfilename)
+        self.log.debug("[%s:%s] Reset temp cert filename: %s" % (self.certhost.hostname,
+                                                                 self.certhost.service,
+                                                                 self.certhost.tempcertfile                                                                 
+                                                                 ))
+        self.log.debug("[%s:%s] Reset temp key filename: %s" % (self.certhost.hostname,
+                                                                 self.certhost.service,
+                                                                 self.certhost.tempkeyfile                                                                 
+                                                                 ))
         
         self.log.debug("[%s:%s] OSGAdminPlugin initialized: testmode=%s vo=%s" % ( self.certhost.hostname, 
                                                                                    self.certhost.service,
@@ -120,20 +128,13 @@ and the osg-cert-request command to be in the PATH.'''
                  
         '''
         self.log.debug("[%s:%s] Start." % (self.certhost.hostname, self.certhost.service) )
-        # Set temp filenames correctly
-        if self.certhost.svcprefix:
-            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.certhostname) 
-            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.certhostname)
-        else:
-            certfilename = "%s.pem" % (self.certhost.certhostname) 
-            keyfilename = "%s-key.pem" % (self.certhost.certhostname)            
-        self.certhost.tempcertfile = "%s/%s" % (self.certhost.temproot, certfilename) 
-        self.certhost.tempkeyfile = "%s/%s" % (self.certhost.temproot, keyfilename) 
-                
+                        
         # If it exists, remove current cert file from temp (since we're about to make a new one).
         try:
             os.remove(self.certhost.tempcertfile)
+            os.remove(self.certhost.tempkeyfile)
         except OSError:
+            # We don't care if they already don't exist. 
             pass
               
         # change working directory to tmproot
@@ -168,24 +169,13 @@ and the osg-cert-request command to be in the PATH.'''
                                                       self.certhost.service, 
                                                       process.before.strip() )  ) 
         
-        if self.certhost.svcprefix:
-            certfilename = "%s-%s.pem" % (self.certhost.svcprefix, self.certhost.certhostname) 
-            keyfilename = "%s-%s-key.pem" % (self.certhost.svcprefix, self.certhost.certhostname)
+        if os.path.exists(self.certhost.tempcertfile) and os.path.exists(self.certhost.tempkeyfile):
+            self.log.debug("[%s:%s] Temp cert and key files exist at expected paths." % ( self.certhost.hostname, 
+                                                      self.certhost.service))
         else:
-            certfilename = "%s.pem" % (self.certhost.certhostname) 
-            keyfilename = "%s-key.pem" % (self.certhost.certhostname)            
-        self.certhost.tempcertfile = "%s/%s" % (self.certhost.temproot, certfilename) 
-        self.certhost.tempkeyfile = "%s/%s" % (self.certhost.temproot, keyfilename) 
-        
-        self.log.debug("[%s:%s] Reset temp cert filename: %s" % (self.certhost.hostname,
-                                                                 self.certhost.service,
-                                                                 self.certhost.tempcertfile                                                                 
-                                                                 ))
-        self.log.debug("[%s:%s] Reset temp key filename: %s" % (self.certhost.hostname,
-                                                                 self.certhost.service,
-                                                                 self.certhost.tempkeyfile                                                                 
-                                                                 ))
-        
+            raise Exception("[%s:%s] Serious Error. Request completed, but temp cert and/or key files don't exist." % ( self.certhost.hostname, 
+                                                      self.certhost.service))
+            
         
         
     def retrieveCertificate(self):
