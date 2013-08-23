@@ -732,6 +732,12 @@ class CertifyHost(threading.Thread):
                 self._newCertificate()
                 self.topcertify.incrementRenewed()
                 self._notifyreplacement()
+        except SshIOPluginConnectionException, e:
+            self.log.error("[%s:%s] Serious error. Aborting. Message: %s " % (self.hostname,
+                                                                              self.service,
+                                                                              e,
+                                                                              ))
+            self.topcertify.incrementError()
         except Exception, e:
             self.log.error("[%s:%s] Serious error. Aborting. Message: %s Exception: %s" % (self.hostname,
                                                                               self.service,
