@@ -11,6 +11,7 @@ import traceback
 import time
 import urllib2
 
+
 from StringIO import StringIO
 
 from ConfigParser import NoOptionError, ConfigParser, MissingSectionHeaderError
@@ -732,7 +733,7 @@ class CertifyHost(threading.Thread):
                 self._newCertificate()
                 self.topcertify.incrementRenewed()
                 self._notifyreplacement()
-        except SshIOPluginConnectionException, e:
+        except IOPluginConnectionException, e:
             self.log.error("[%s:%s] Serious error. Aborting. Message: %s " % (self.hostname,
                                                                               self.service,
                                                                               e,
@@ -807,6 +808,21 @@ class CertifyHost(threading.Thread):
 
         #self.log.debug("[%s:%s] Done."% (self.hostname,self.service))        
         
+
+class IOPluginConnectionException(Exception):
+    pass
+
+
+
+
+
+
+
+
+
+
+
+
 
 #
 # Dynamic class loader for plugins from Robert Brewer
