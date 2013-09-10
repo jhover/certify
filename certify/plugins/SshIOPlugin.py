@@ -9,6 +9,7 @@ import shutil
 import logging
 import commands
 from certify.core import CertifyIOInterface
+from certify.core import IOPluginConnectionException
 
 try:
     import pxssh
@@ -19,8 +20,9 @@ except ImportError:
 
 
 
-class SshIOPluginConnectionException(Exception):
+class SshIOPluginConnectionException(IOPluginConnectionException):
     pass
+
 
 
 class SshIOPlugin(CertifyIOInterface):
