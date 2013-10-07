@@ -651,7 +651,7 @@ class CertifyHost(threading.Thread):
         # Establish local temporary working directory
         workdir = self.globalconfig.get('global','workdir')
         workdir = os.path.expanduser(workdir)
-        self.temproot = "%s/%s" % ( workdir, self.hostname )        
+        self.temproot = "%s/%s/%s" % ( workdir, self.hostname, self.service )        
         
         try:
             os.makedirs(self.temproot)
