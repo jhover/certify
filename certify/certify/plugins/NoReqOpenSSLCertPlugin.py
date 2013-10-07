@@ -4,6 +4,7 @@ import time
 import datetime
 import logging
 import commands
+import traceback
 
 try:
     import OpenSSL
@@ -209,8 +210,9 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
             self.log.debug("Cert modulus is %s" % outa.strip())
             self.log.debug("Key modulus is %s" % outb.strip())
             return True
-        except Exception:
-            pass
+        except Exception, ex:
+            self.log.error('Exception during cert/key validation...')
+            self.log.debug("Exception: %s" % traceback.format_exc())
         return True
       
     
