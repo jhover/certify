@@ -205,7 +205,7 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
                                                                   ) )
             cmda = "/usr/bin/openssl x509 -noout -modulus -in %s | /usr/bin/openssl md5" % self.certhost.tempcertfile
             (s,outa) = commands.getstatusoutput(cmda)
-            cmdb = "/usr/bin/openssl rsa -noout -modulus -in /etc/grid-security/hostkey.pem | /usr/bin/openssl md5" % self.certhost.tempkeyfile
+            cmdb = "/usr/bin/openssl rsa -noout -modulus -in %s | /usr/bin/openssl md5" % self.certhost.tempkeyfile
             (s,outb) = commands.getstatusoutput(cmdb)
             self.log.debug("Cert modulus is %s" % outa.strip())
             self.log.debug("Key modulus is %s" % outb.strip())
