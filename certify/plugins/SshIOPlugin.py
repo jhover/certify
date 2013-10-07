@@ -260,9 +260,10 @@ class SshIOPlugin(CertifyIOInterface):
                                                               self.certhost.service,
                                                                output.strip() ))
         if status:
-            raise Exception("Error getting file %s from host %s" % (remotepath,
+            raise Exception("Error getting file %s from host %s" % (srcpath,
                                                                     self.certhost.hostname))
-        self.log.debug('[%s:%s] Done.'% (self.certhost.hostname, self.certhost.service))
+        self.log.debug('[%s:%s] Done.'% (self.certhost.hostname, 
+                                         self.certhost.service))
 
 
     def putFile(self, srcpath, destpath):
