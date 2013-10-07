@@ -190,10 +190,24 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
         ( /usr/bin/openssl x509 -noout -modulus -in /etc/grid-security/hostcert.pem | /usr/bin/openssl md5 ; \
         /usr/bin/openssl rsa -noout -modulus -in /etc/grid-security/hostkey.pem | /usr/bin/openssl md5 ) | uniq | wc -l
         
+                    self.getFile( self.certhost.certfile, 
+                           self.certhost.tempcertfile)            
+            self.getFile( self.certhost.keyfile, 
+                           self.certhost.tempkeyfile)        
        
         '''
         try:
-            a = self.certhost.ioplugin.executeCommand(cmd)
+            self.log.debug("Validating cert/key for [%s:%s] at %s and %s" % ( self.certhost.hostname, 
+                                                                   self.certhost.service,
+                                                                   self.certhost.tempcertfile,
+                                                                   self.certhost.tempkeyfile,
+                                                                  ) )
+            cmda = "/usr/bin/openssl x509 -noout -modulus -in %s | /usr/bin/openssl md5" % self.certhost.tempcertfile
+            (s,outa) = commands.getstatusoutput(cmda)
+            cmdb = "/usr/bin/openssl rsa -noout -modulus -in /etc/grid-security/hostkey.pem | /usr/bin/openssl md5" % self.certhost.tempkeyfile
+            (s,outb) = commands.getstatusoutput(cmdb)
+            self.log.debug("Cert modulus is %s" % outa.strip())
+            self.log.debug("Key modulus is %s" % outb.strip())
             return True
         except Exception:
             pass
