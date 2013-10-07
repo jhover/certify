@@ -190,6 +190,7 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
         ( /usr/bin/openssl x509 -noout -modulus -in /etc/grid-security/hostcert.pem | /usr/bin/openssl md5 ; \
         /usr/bin/openssl rsa -noout -modulus -in /etc/grid-security/hostkey.pem | /usr/bin/openssl md5 ) | uniq | wc -l
         
+       
         '''
         try:
             a = self.certhost.ioplugin.executeCommand(cmd)
