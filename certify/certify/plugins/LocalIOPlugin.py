@@ -81,6 +81,7 @@ class LocalIOPlugin(CertifyIOInterface):
         '''
         self.log.debug('[%s:%s] Start...'% (self.certhost.hostname, self.certhost.service))
         self.getFile(self.certhost.certfile, self.certhost.tempcertfile, )
+        self.getFile(self.certhost.keyfile, self.certhost.tempkeyfile, )
         self.log.debug('[%s:%s] End.'% (self.certhost.hostname, self.certhost.service))
 
         

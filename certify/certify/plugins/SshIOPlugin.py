@@ -82,7 +82,7 @@ class SshIOPlugin(CertifyIOInterface):
 
     def getCertificate(self):
         '''
-            Gets cert file however necessary, places them in certhost.tempcertfile
+            Gets cert and key files however necessary, places them in certhost.tempcertfile
             If cert doesn't exist. Doesn't do anything.
             
             As this is the first command to talk to the remote host, we need to handle any 
@@ -92,11 +92,14 @@ class SshIOPlugin(CertifyIOInterface):
         self.log.debug('[%s:%s] Start...'% (self.certhost.hostname, self.certhost.service))        
         try:
             self.getFile( self.certhost.certfile, 
-                           self.certhost.tempcertfile)                
+                           self.certhost.tempcertfile)            
+            self.getFile( self.certhost.keyfile, 
+                           self.certhost.tempkeyfile)              
         except Exception, e:
-            self.log.debug('[%s:%s] No certfile %s on remote host. Exception: %s'% (self.certhost.hostname,
+            self.log.debug('[%s:%s] No certfile %s and/or keyfile %s on remote host. Exception: %s'% (self.certhost.hostname,
                                                                                     self.certhost.service, 
                                                                    self.certhost.certfile,
+                                                                   self.certhost.keyfile,
                                                                    e ))
         self.log.debug('[%s:%s] Retrieved host certificate.'% (self.certhost.hostname, self.certhost.service))
         #self.log.debug('[%s:%s] End.'% (self.certhost.hostname, self.certhost.service))
