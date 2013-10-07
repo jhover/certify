@@ -197,6 +197,7 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
                            self.certhost.tempkeyfile)        
        
         '''
+        retval = False
         try:
             self.log.debug("Validating cert/key for [%s:%s] at %s and %s" % ( self.certhost.hostname, 
                                                                    self.certhost.service,
@@ -209,11 +210,15 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
             (s,outb) = commands.getstatusoutput(cmdb)
             self.log.debug("Cert modulus is %s" % outa.strip())
             self.log.debug("Key modulus is %s" % outb.strip())
-            return True
+            
+            if outa.strip() == outb.strip():
+                retval = True
         except Exception, ex:
             self.log.error('Exception during cert/key validation...')
             self.log.debug("Exception: %s" % traceback.format_exc())
-        return True
+        self.log.info("[%s:%s] Cert/key pair validated." % (self.certhost.hostname, 
+                                                           self.certhost.service) )
+        return retval
       
     
                       
