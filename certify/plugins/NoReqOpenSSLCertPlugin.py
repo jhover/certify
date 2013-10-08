@@ -186,16 +186,9 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
     def _validateCertPair(self):
         '''
          Checks to be sure certificate and private key go together. 
-        Uses command:
-        
-        ( /usr/bin/openssl x509 -noout -modulus -in /etc/grid-security/hostcert.pem | /usr/bin/openssl md5 ; \
-        /usr/bin/openssl rsa -noout -modulus -in /etc/grid-security/hostkey.pem | /usr/bin/openssl md5 ) | uniq | wc -l
-        
-                    self.getFile( self.certhost.certfile, 
-                           self.certhost.tempcertfile)            
-            self.getFile( self.certhost.keyfile, 
-                           self.certhost.tempkeyfile)        
-       
+        Uses commands:        
+        /usr/bin/openssl x509 -noout -modulus -in /etc/grid-security/hostcert.pem | /usr/bin/openssl md5 
+        /usr/bin/openssl rsa -noout -modulus -in /etc/grid-security/hostkey.pem | /usr/bin/openssl md5                
         '''
         retval = False
         try:
@@ -213,11 +206,16 @@ class NoReqOpenSSLCertPlugin(CertifyCertInterface):
             
             if outa.strip() == outb.strip():
                 retval = True
+                self.log.debug("[%s:%s] Cert/key pair validated." % (self.certhost.hostname, 
+                                                           self.certhost.service) )
+            else:
+                retval = False
+                self.log.warning("[%s:%s] Cert/key pair not validated." % (self.certhost.hostname, 
+                                                           self.certhost.service) )
         except Exception, ex:
             self.log.error('Exception during cert/key validation...')
             self.log.debug("Exception: %s" % traceback.format_exc())
-        self.log.info("[%s:%s] Cert/key pair validated." % (self.certhost.hostname, 
-                                                           self.certhost.service) )
+        
         return retval
       
     
