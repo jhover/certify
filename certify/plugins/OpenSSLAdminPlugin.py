@@ -14,10 +14,10 @@ try:
     intmajor = int(major)
     intminor = int(minor)
     if intmajor < 1 and intminor < 7:
-        print "This plugin requires pyOpenSSL >= 0.7"
+        print "Incompatible verions %s.%s: This plugin requires pyOpenSSL >= 0.7" % (intmajor, intminor)
         sys.exit(0)   
 except ImportError:
-    print  "This plugin requires pyOpenSSL >= 0.7"
+    print  "Import error: this plugin requires pyOpenSSL >= 0.7"
     sys.exit(0)
     
    
