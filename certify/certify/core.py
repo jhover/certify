@@ -449,7 +449,7 @@ class CertifyThreadManager(threading.Thread):
         self.log.debug('ThreadManager %s : Start...' % self.name)    
         for ch in self.infolist:
             (c,hc,se,h,s) = ch
-            t = CertifyHost(c, hc,se,h,s)
+            t = CertifyHost(c,hc,se,h,s)
             self.threads.append(t)
         for t in self.threads:
             t.start()        
@@ -593,10 +593,19 @@ class CertifyHost(threading.Thread):
         self.config = config
         self.section = section 
         self.hostname = host
+       
+        try:
+            self.hostname = self.config.get(section, 'hostname')
+        except NoOptionError:
+            pass
+        
+        
         try:
             self.certhostname = self.config.get(section, 'certhostname')
         except NoOptionError:
             self.certhostname = self.hostname
+
+        
         
         try:
             self.subjectaltnames = self.config.get(section, 'subjectaltnames')
