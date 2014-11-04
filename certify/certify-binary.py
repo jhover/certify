@@ -3,7 +3,7 @@ import os
 import sys
 import getopt
 import commands
-import getpass
+# import getpass ?not needed
 import stat
 import re
 import datetime
