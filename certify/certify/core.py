@@ -20,7 +20,7 @@ try:
 except:
     from email.MIMEText import MIMEText
 
-__version__ = "0.9.4"
+__version__ = "0.9.5"
 
 class Certify(object):
     '''

@@ -8,7 +8,7 @@ HOMEEXE=~/lib/python/certify/certify-binary.py
 if [ -f $RPMEXE ]; then
 	python /usr/lib/python$PYVER/site-packages/certify/certify-binary.py $*
 elif [ -f $HOMEEXE ]; then
-    export PYTHONPATH=~/lib/python
+    export PYTHONPATH=$PYTHONPATH:~/lib/python
     python $HOMEEXE $*
 else
 	echo "No suitable Certify executable found."
