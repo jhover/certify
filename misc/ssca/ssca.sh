@@ -13,18 +13,25 @@ create_root_ca(){
  echo "Making root CA"
  echo "Making directories..."
  mkdir -p root/private root/certs root/newcerts root/crl root/csr
+
  echo "Making root CA key..."
- openssl genrsa -aes256 -out root/private/ca.key.pem 4096
+openssl genrsa -aes256 -passout pass:abcdef \
+ -out root/private/ca.key.pem 4096
+openssl rsa -passin pass:abcdef  -in root/private/ca.key.pem \
+	 -out root/private/ca.keynopw.pem
+ chmod 400 root/private/ca.keynopw.pem
  chmod 400 root/private/ca.key.pem
+
  echo "Making index, serial, crlnumber files..."
  touch root/index.txt
  echo 1000 > root/serial
  echo 1000 > root/crlnumber
  echo "Making root CA request and cert..."
  openssl req -config root/openssl.cnf \
-     -key root/private/ca.key.pem \
+    -key root/private/ca.keynopw.pem \
      -new -x509 -days 7300 -sha256 -extensions v3_ca \
-     -out root/certs/ca.cert.pem
+    -out root/certs/ca.cert.pem \
+    -subj "/C=US/ST=NY/O=BNL/OU=SDCC/CN=VC3-Root/emailAddress=jhover@bnl.gov"
  chmod 444 root/certs/ca.cert.pem
  echo "Emitting CA certificate..."
  openssl x509 -noout -text -in root/certs/ca.cert.pem
@@ -44,15 +51,22 @@ create_intermediate_ca(){
  echo 1000 > intermediate/crlnumber
  
  echo "Making intermediate CA key..."
- openssl genrsa -aes256 \
+ openssl genrsa -aes256  -passout pass:abcdef  \
     -out intermediate/private/intermediate.key.pem 4096
  chmod 400 intermediate/private/intermediate.key.pem
 
+openssl rsa -passin pass:abcdef  -in intermediate/private/intermediate.key.pem \
+	 -out intermediate/private/intermediate.keynopw.pem
+ chmod 400 intermediate/private/intermediate.keynopw.pem
+
+
  echo "Making intermediate request..."
  openssl req -config intermediate/openssl.cnf -new -sha256 \
-      -key intermediate/private/intermediate.key.pem \
-      -out intermediate/csr/intermediate.csr.pem		
+    -key intermediate/private/intermediate.keynopw.pem \
+    -out intermediate/csr/intermediate.csr.pem \
+     -subj "/C=US/ST=NY/O=BNL/OU=SDCC/CN=VC3-Intermediate/emailAddress=jhover@bnl.gov"
 
+ 
  echo "Signing intermediate request, generating intermeidate..."
  openssl ca -config root/openssl.cnf -extensions v3_intermediate_ca \
       -days 3650 -notext -md sha256 \
@@ -94,8 +108,9 @@ chmod 400 intermediate/private/$hostname.keynopw.pem
 
  echo "Creating CSR for host cert using new private key..."
  openssl req -config intermediate/openssl.cnf \
-    -key intermediate/private/$hostname.key.pem \
-      -new -sha256 -out intermediate/csr/$hostname.csr.pem
+    -key intermediate/private/$hostname.keynopw.pem \
+    -new -sha256 -out intermediate/csr/$hostname.csr.pem \
+    -subj "/C=US/ST=NY/O=BNL/OU=SDCC/CN=$hostname/emailAddress=jhover@bnl.gov"
 
  echo "Signing CSR with intermediate private key..."
  openssl ca -config intermediate/openssl.cnf \
@@ -138,7 +153,8 @@ chmod 400 intermediate/private/$username.keynopw.pem
  echo "Creating CSR for user cert using new private key..."
  openssl req -config intermediate/openssl.cnf \
     -key intermediate/private/$username.key.pem \
-      -new -sha256 -out intermediate/csr/$username.csr.pem
+    -new -sha256 -out intermediate/csr/$username.csr.pem \
+    -subj "/C=US/ST=NY/O=BNL/OU=SDCC/CN=$username"
 
  echo "Signing CSR with intermediate private key..."
  openssl ca -config intermediate/openssl.cnf \

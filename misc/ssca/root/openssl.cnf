@@ -16,7 +16,7 @@ serial            = $dir/serial
 RANDFILE          = $dir/private/.rand
 
 # The root key and root certificate.
-private_key       = $dir/private/ca.key.pem
+private_key       = $dir/private/ca.keynopw.pem
 certificate       = $dir/certs/ca.cert.pem
 
 # For certificate revocation lists.
