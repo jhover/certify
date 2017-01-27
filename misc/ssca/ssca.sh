@@ -68,7 +68,7 @@ openssl rsa -passin pass:abcdef  -in intermediate/private/intermediate.key.pem \
 
  
  echo "Signing intermediate request, generating intermeidate..."
- openssl ca -config root/openssl.cnf -extensions v3_intermediate_ca \
+openssl ca -batch -config root/openssl.cnf -extensions v3_intermediate_ca \
       -days 3650 -notext -md sha256 \
       -in intermediate/csr/intermediate.csr.pem \
       -out intermediate/certs/intermediate.cert.pem
@@ -99,12 +99,12 @@ create_host_certificate(){
  hostname=`hostname -f`
 
  echo "Generating new private key for host cert..."
- openssl genrsa -aes256 \
+ openssl genrsa -aes256 -passout pass:abcdef\
     -out intermediate/private/$hostname.key.pem 2048
  chmod 400 intermediate/private/$hostname.key.pem
-openssl rsa -in intermediate/private/$hostname.key.pem \
+ openssl rsa -passin pass:abcdef -in intermediate/private/$hostname.key.pem \
   -out intermediate/private/$hostname.keynopw.pem
-chmod 400 intermediate/private/$hostname.keynopw.pem
+ chmod 400 intermediate/private/$hostname.keynopw.pem
 
  echo "Creating CSR for host cert using new private key..."
  openssl req -config intermediate/openssl.cnf \
@@ -113,7 +113,7 @@ chmod 400 intermediate/private/$hostname.keynopw.pem
     -subj "/C=US/ST=NY/O=BNL/OU=SDCC/CN=$hostname/emailAddress=jhover@bnl.gov"
 
  echo "Signing CSR with intermediate private key..."
- openssl ca -config intermediate/openssl.cnf \
+openssl ca -batch -config intermediate/openssl.cnf \
       -extensions server_cert -days 375 -notext -md sha256 \
       -in intermediate/csr/$hostname.csr.pem \
       -out intermediate/certs/$hostname.cert.pem
@@ -142,22 +142,22 @@ fi
  username=$1
  echo "Creating user certificate for $username ..."
  echo "Generating new private key for user cert..."
- openssl genrsa -aes256 \
+ openssl genrsa  -passout pass:abcdef -aes256 \
     -out intermediate/private/$username.key.pem 2048
  chmod 400 intermediate/private/$username.key.pem
-openssl rsa -in intermediate/private/$username.key.pem \
+ openssl rsa -passin pass:abcdef -in intermediate/private/$username.key.pem \
 -out intermediate/private/$username.keynopw.pem
-chmod 400 intermediate/private/$username.keynopw.pem
+ chmod 400 intermediate/private/$username.keynopw.pem
 
 
  echo "Creating CSR for user cert using new private key..."
  openssl req -config intermediate/openssl.cnf \
-    -key intermediate/private/$username.key.pem \
+    -key intermediate/private/$username.keynopw.pem \
     -new -sha256 -out intermediate/csr/$username.csr.pem \
     -subj "/C=US/ST=NY/O=BNL/OU=SDCC/CN=$username"
 
  echo "Signing CSR with intermediate private key..."
- openssl ca -config intermediate/openssl.cnf \
+ openssl ca -batch -config intermediate/openssl.cnf \
     -extensions usr_cert -days 375 -notext -md sha256 \
       -in intermediate/csr/$username.csr.pem \
       -out intermediate/certs/$username.cert.pem
@@ -174,6 +174,17 @@ clean(){
  rm -f */certs/*.pem
  rm -f */private/*.pem	
  rm -f */csr/*.pem
+ rm -f */newcerts/*.pem
+ rm -f */index.tx*
+ rm -f  */serial.old
+ touch root/index.txt
+ touch intermediate/index.txt
+ echo 1000 > root/serial
+ echo 1000 > root/crlnumber
+ echo 1000 > intermediate/serial
+ echo 1000 > intermediate/crlnumber
+
+
 }
 
 
