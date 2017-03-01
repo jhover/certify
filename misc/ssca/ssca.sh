@@ -96,8 +96,13 @@ echo "Done"
 
 # Create a host certificate for this host
 create_host_certificate(){
- hostname=`hostname -f`
 
+ if [[ "$#" -eq "0" ]] ;   then
+    echo "hostcert requires FQ hostname argument."
+    exit 1
+ fi
+
+ hostname=$1
  echo "Generating new private key for host cert..."
  openssl genrsa -aes256 -passout pass:abcdef\
     -out intermediate/private/$hostname.key.pem 2048
@@ -203,7 +208,7 @@ certchain)
     ;;
 
 hostcert)
-    create_host_certificate
+    create_host_certificate $2
     RETVAL=$?
     ;;
 usercert)
